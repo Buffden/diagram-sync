@@ -32,43 +32,48 @@ npm install -g diagram-sync
 
 ## Quick Start
 
-1. Add a config file to your project root:
-
-```json
-{
-  "defaultFormat": "svg",
-  "recursive": true,
-  "jobs": [
-    {
-      "name": "architecture-diagrams",
-      "type": "plantuml",
-      "input": "docs/diagrams",
-      "output": "docs/generated"
-    }
-  ]
-}
-```
-
-2. Run:
+1. Run from your project root:
 
 ```bash
 npx diagram-sync
 ```
 
-Your `.puml` files in `docs/diagrams` will be rendered as SVGs into `docs/generated`.
+That's it. `diagram-sync` recursively finds all `.puml` files in your repo and generates SVGs into a `diagrams/` directory, mirroring each file's original path.
+
+2. Optionally add a config file for named jobs:
+
+```json
+{
+  "jobs": [
+    {
+      "name": "architecture",
+      "type": "plantuml"
+    }
+  ]
+}
+```
+
+---
+
+## How Output Paths Work
+
+No input or output directories to configure. The output location is derived automatically from where the source file lives:
+
+```text
+src/services/payment/flow.puml
+→ diagrams/src/services/payment/flow.svg
+
+docs/architecture/system.puml
+→ diagrams/docs/architecture/system.svg
+```
+
+The `diagrams/` folder at your repo root is always the output root. The internal structure mirrors your source tree exactly.
 
 ---
 
 ## Configuration
 
-### Options
-
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `defaultFormat` | `string` | `"svg"` | Output format (`svg`) |
-| `recursive` | `boolean` | `true` | Recursively discover source files |
-| `cleanOutput` | `boolean` | `false` | Clear output directory before generation |
-| `jobs` | `array` | required | List of diagram generation jobs |
+Config is optional. Without it, `diagram-sync` runs with defaults — discovers all `.puml` files and generates SVGs into `diagrams/`.
 
 ### Job Options
 
@@ -76,9 +81,6 @@ Your `.puml` files in `docs/diagrams` will be rendered as SVGs into `docs/genera
 |---|---|---|
 | `name` | `string` | Label for the job (used in logs) |
 | `type` | `string` | Diagram provider (`plantuml`) |
-| `input` | `string` | Path to source diagram files |
-| `output` | `string` | Path for generated output files |
-| `format` | `string` | Override `defaultFormat` per job |
 
 ### Custom Config Path
 
@@ -101,22 +103,22 @@ npx diagram-sync --config path/to/diagram-sync.config.json
 
 ## Example
 
-Source file:
+Source file anywhere in your repo:
 
-```
-docs/diagrams/payment-flow.puml
+```text
+src/services/payment/flow.puml
 ```
 
-Generated output:
+Generated output, mirroring the path:
 
-```
-docs/generated/payment-flow.svg
+```text
+diagrams/src/services/payment/flow.svg
 ```
 
 Reference it in your README:
 
 ```markdown
-![Payment Flow](docs/generated/payment-flow.svg)
+![Payment Flow](diagrams/src/services/payment/flow.svg)
 ```
 
 ---
