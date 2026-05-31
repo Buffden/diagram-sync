@@ -1,0 +1,26 @@
+# Internal Docs
+internal-docs/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
