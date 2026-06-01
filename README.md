@@ -139,7 +139,7 @@ Future versions will support a staleness check — failing the build when source
 ## Requirements
 
 - Node.js 18+
-- Java
+- Java 11+ (`brew install openjdk` or `apt install default-jre`)
 - plantuml (`brew install plantuml` or `apt install plantuml`)
 
 ---
