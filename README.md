@@ -2,7 +2,7 @@
 
 > Keep architecture diagrams synchronized with source code.
 
-`diagram-sync` is a CLI tool that automatically generates SVG files from diagram source files (PlantUML, and more in the future). It removes the manual export step so your README, wiki, and documentation always reflect the latest diagram sources.
+`diagram-sync` is a CLI tool that automatically generates SVG files from diagram source files. It removes the manual export step so your README, wiki, and documentation always reflect the latest diagram sources.
 
 ---
 
@@ -38,7 +38,7 @@ npm install -g diagram-sync
 npx diagram-sync
 ```
 
-That's it. `diagram-sync` recursively finds all `.puml` files in your repo and generates SVGs into a `diagrams/` directory, mirroring each file's original path.
+That's it. `diagram-sync` recursively finds all diagram source files in your repo and generates SVGs into a `diagrams/` directory, mirroring each file's original path.
 
 2. Optionally add a config file for named jobs:
 
@@ -73,7 +73,7 @@ The `diagrams/` folder at your repo root is always the output root. The internal
 
 ## Configuration
 
-Config is optional. Without it, `diagram-sync` runs with defaults — discovers all `.puml` files and generates SVGs into `diagrams/`.
+Config is optional. Without it, `diagram-sync` runs with defaults — discovers all supported diagram source files and generates SVGs into `diagrams/`.
 
 ### Job Options
 
@@ -139,7 +139,8 @@ Future versions will support a staleness check — failing the build when source
 ## Requirements
 
 - Node.js 18+
-- Java (required by PlantUML)
+- Java 11+ (`brew install openjdk` or `apt install default-jre`)
+- plantuml (`brew install plantuml` or `apt install plantuml`)
 
 ---
 
