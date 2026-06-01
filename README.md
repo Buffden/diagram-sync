@@ -153,43 +153,81 @@ npm run diagrams
 
 ### 3. CI/CD — generate only
 
-Regenerates SVGs on every push. Generated files exist only in the runner and are not saved back to the repo:
+Regenerates SVGs on every push. Generated files exist only in the runner and are not saved back to the repo.
+
+Create `.github/workflows/diagram-sync.yml` in your repo:
 
 ```yaml
-- name: Install PlantUML
-  run: |
-    sudo apt-get update
-    sudo apt-get install -y --no-install-recommends default-jre plantuml
+name: Generate Diagrams
 
-- name: Generate diagrams
-  run: npx diagram-sync
+on:
+  push:
+    paths:
+      - '**/*.puml'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends default-jre plantuml
+
+      - name: Generate diagrams
+        run: npx diagram-sync
 ```
+
+> The workflow triggers automatically when any `.puml` file is pushed. You can also trigger it manually from **GitHub → Actions → Generate Diagrams → Run workflow**.
 
 ### 4. CI/CD — generate and commit
 
-Regenerates SVGs and commits them back to the repo automatically:
+Same as above but commits the generated SVGs back to the repo automatically:
 
 ```yaml
-- name: Install PlantUML
-  run: |
-    sudo apt-get update
-    sudo apt-get install -y --no-install-recommends default-jre plantuml
+name: Generate Diagrams
 
-- name: Generate diagrams
-  run: npx diagram-sync
+on:
+  push:
+    paths:
+      - '**/*.puml'
+  workflow_dispatch:
 
-- name: Commit generated SVGs
-  run: |
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add diagrams/
-    if git diff --staged --quiet; then
-      echo "No diagram changes to commit."
-    else
-      git commit -m "chore: auto-export diagrams [skip ci]"
-      git push
-    fi
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends default-jre plantuml
+
+      - name: Generate diagrams
+        run: npx diagram-sync
+
+      - name: Commit generated SVGs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add diagrams/
+          if git diff --staged --quiet; then
+            echo "No diagram changes to commit."
+          else
+            git commit -m "chore: auto-export diagrams [skip ci]"
+            git push
+          fi
 ```
+
+> For the commit step to work, go to **GitHub → Settings → Actions → General → Workflow permissions** and enable **Read and write permissions**.
 
 Future versions will support a staleness check — failing the build when source files have changed but outputs have not been regenerated.
 
