@@ -1,6 +1,6 @@
 {
   "name": "diagram-sync",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "CLI tool to generate and sync architecture diagrams from source files for README, Wiki, and CI/CD documentation workflows.",
   "bin": {
     "diagram-sync": "dist/index.js"
