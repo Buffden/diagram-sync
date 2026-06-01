@@ -2,7 +2,11 @@
 
 > Keep architecture diagrams synchronized with source code.
 
-`diagram-sync` is a CLI tool that automatically generates SVG files from PlantUML diagram source files. Drop it into any repo and run `npx diagram-sync` — it finds every `.puml` file, renders it to SVG, and mirrors the output under a `diagrams/` folder. No config required.
+[![npm version](https://img.shields.io/npm/v/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
+[![npm downloads](https://img.shields.io/npm/dw/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
+[![license](https://img.shields.io/npm/l/diagram-sync)](./LICENSE)
+
+`diagram-sync` is a CLI tool that automatically generates SVG files from diagram source files. Drop it into any repo and run `npx diagram-sync` — it finds every supported diagram file, renders it to SVG, and mirrors the output under a `diagrams/` folder. No config required.
 
 ```bash
 npx diagram-sync
@@ -14,7 +18,7 @@ npx diagram-sync
 
 Engineering teams update code but forget to re-export architecture diagrams. The result is stale documentation — READMEs, wikis, and onboarding docs that no longer reflect reality.
 
-`diagram-sync` eliminates the manual export step entirely. You edit the `.puml` source. It generates the SVG automatically — locally or in CI/CD.
+`diagram-sync` eliminates the manual export step entirely. You edit the diagram source file. It generates the SVG automatically — locally or in CI/CD.
 
 > **Honest note:** This tool removes export friction. It does not force developers to keep source diagrams accurate. That is a people problem, not a tooling problem.
 
@@ -37,7 +41,7 @@ npm install --save-dev diagram-sync
 
 ## Quick Start
 
-1. Add a `.puml` file anywhere in your repo
+1. Add a `.puml` or `.mmd` file anywhere in your repo
 2. Run `npx diagram-sync` from the project root
 3. Find the generated SVG in `diagrams/` mirroring the source path
 
@@ -59,7 +63,7 @@ Reference in your README:
 - Recursively scans your repo for diagram source files
 - Skips `node_modules`, `.git`, `dist`, `build`, `diagrams`
 - Derives the output path from the source file location — no input/output directories to configure
-- Generates SVGs using the installed diagram tool (PlantUML for `.puml` files)
+- Generates SVGs using the installed diagram tool (PlantUML for `.puml`, Mermaid for `.mmd`)
 
 ---
 
@@ -89,7 +93,7 @@ npx diagram-sync --config diagram-sync.config.json
 | Field | Type | Description |
 |---|---|---|
 | `name` | `string` | Label for the job (used in logs) |
-| `type` | `string` | Diagram provider (`plantuml`) |
+| `type` | `string` | Diagram provider (`plantuml`, `mermaid`) |
 
 ---
 
@@ -98,7 +102,7 @@ npx diagram-sync --config diagram-sync.config.json
 | Provider | Status |
 |---|---|
 | PlantUML | Supported |
-| Mermaid | Planned |
+| Mermaid | Supported |
 | Graphviz | Planned |
 | Draw.io | Planned |
 
@@ -216,19 +220,29 @@ jobs:
 ## Requirements
 
 - Node.js 18+
-- Java 11+ (`brew install openjdk` or `apt install default-jre`)
-- PlantUML (`brew install plantuml` or `apt install plantuml`)
+- For PlantUML: Java 11+ (`brew install openjdk` or `apt install default-jre`) and PlantUML (`brew install plantuml` or `apt install plantuml`)
+- For Mermaid: `npm install -g @mermaid-js/mermaid-cli`
+
+Only install what you need — providers are detected at runtime and missing ones are skipped with a warning.
 
 ---
 
 ## Common Use Cases
 
 - **How to automate PlantUML SVG generation in CI/CD**
+- **How to automate Mermaid diagram generation in CI/CD**
 - **How to keep README architecture diagrams up to date automatically**
-- **How to sync PlantUML diagrams from source files**
+- **How to sync architecture diagrams from source files**
 - **How to generate architecture diagrams on GitHub Actions**
 - **How to treat architecture diagrams as code**
-- **Documentation-as-code workflow for PlantUML**
+- **Documentation-as-code workflow for PlantUML and Mermaid**
+
+---
+
+## Links
+
+- **npm:** [https://www.npmjs.com/package/diagram-sync](https://www.npmjs.com/package/diagram-sync)
+- **GitHub:** [https://github.com/Buffden/diagram-sync](https://github.com/Buffden/diagram-sync)
 
 ---
 
