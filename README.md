@@ -123,13 +123,72 @@ Reference it in your README:
 
 ---
 
-## CI/CD Usage
+## Usage Options
 
-Run `diagram-sync` as part of your pipeline to regenerate diagrams on every push:
+### 1. One-off local generation
+
+Run from your project root whenever you want to regenerate diagrams:
+
+```bash
+npx diagram-sync
+```
+
+### 2. npm script
+
+Install as a dev dependency and add a script to your `package.json`:
+
+```bash
+npm install --save-dev diagram-sync
+```
+
+```json
+"scripts": {
+  "diagrams": "diagram-sync"
+}
+```
+
+```bash
+npm run diagrams
+```
+
+### 3. CI/CD — generate only
+
+Regenerates SVGs on every push. Generated files exist only in the runner and are not saved back to the repo:
 
 ```yaml
+- name: Install PlantUML
+  run: |
+    sudo apt-get update
+    sudo apt-get install -y --no-install-recommends default-jre plantuml
+
 - name: Generate diagrams
-  run: npx diagram-sync --config diagram-sync.config.json
+  run: npx diagram-sync
+```
+
+### 4. CI/CD — generate and commit
+
+Regenerates SVGs and commits them back to the repo automatically:
+
+```yaml
+- name: Install PlantUML
+  run: |
+    sudo apt-get update
+    sudo apt-get install -y --no-install-recommends default-jre plantuml
+
+- name: Generate diagrams
+  run: npx diagram-sync
+
+- name: Commit generated SVGs
+  run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git add diagrams/
+    if git diff --staged --quiet; then
+      echo "No diagram changes to commit."
+    else
+      git commit -m "chore: auto-export diagrams [skip ci]"
+      git push
+    fi
 ```
 
 Future versions will support a staleness check — failing the build when source files have changed but outputs have not been regenerated.
