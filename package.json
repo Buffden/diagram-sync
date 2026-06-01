@@ -21,7 +21,15 @@
     "ci-cd",
     "developer-tools"
   ],
-  "author": "",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "author": {
+    "name": "Buffden",
+    "url": "https://buffden.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
