@@ -13,13 +13,20 @@
   "keywords": [
     "plantuml",
     "diagram",
+    "diagram-sync",
     "architecture",
+    "architecture-diagram",
     "documentation-as-code",
     "diagrams-as-code",
     "svg",
+    "svg-generator",
     "github-actions",
     "ci-cd",
-    "developer-tools"
+    "developer-tools",
+    "mermaid",
+    "devops",
+    "automation",
+    "technical-documentation"
   ],
   "files": [
     "dist/",
