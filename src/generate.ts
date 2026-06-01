@@ -4,16 +4,20 @@ import { log } from './logger';
 import { getProvider } from './providers';
 import { DiagramProvider } from './providers/types';
 
-const checkedProviders = new Set<DiagramProvider>();
+const availableProviders = new Set<DiagramProvider>();
+const unavailableProviders = new Set<DiagramProvider>();
 
-function ensureAvailable(provider: DiagramProvider): void {
-  if (checkedProviders.has(provider)) return;
+function isAvailable(provider: DiagramProvider): boolean {
+  if (availableProviders.has(provider)) return true;
+  if (unavailableProviders.has(provider)) return false;
   const check = provider.check();
   if (!check.available) {
-    log.error(check.message ?? `${provider.name} is not available.`);
-    process.exit(1);
+    log.warn(check.message ?? `${provider.name} is not available. Skipping ${provider.name} files.`);
+    unavailableProviders.add(provider);
+    return false;
   }
-  checkedProviders.add(provider);
+  availableProviders.add(provider);
+  return true;
 }
 
 export function generateDiagrams(files: string[], root: string): void {
@@ -37,7 +41,10 @@ export function generateDiagrams(files: string[], root: string): void {
       continue;
     }
 
-    ensureAvailable(provider);
+    if (!isAvailable(provider)) {
+      failed++;
+      continue;
+    }
 
     const outputDir = path.join(root, 'diagrams', path.dirname(relative));
     fs.mkdirSync(outputDir, { recursive: true });
