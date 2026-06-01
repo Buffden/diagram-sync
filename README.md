@@ -225,12 +225,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git reset --soft origin/main
           git add diagrams/
           if git diff --staged --quiet; then
             echo "No diagram changes to commit."
           else
             git commit -m "chore: auto-export diagrams [skip ci]"
-            git push origin main
+            git push origin HEAD:main
           fi
 ```
 
