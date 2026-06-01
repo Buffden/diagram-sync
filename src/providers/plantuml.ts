@@ -7,10 +7,10 @@ export const plantumlProvider: DiagramProvider = {
 
   check() {
     const result = spawnSync('plantuml', ['-version'], { encoding: 'utf-8' });
-    if (result.error) {
+    if (result.error || result.status !== 0) {
       return {
         available: false,
-        message: 'plantuml not found. Install it via: brew install plantuml  or  apt install plantuml',
+        message: 'plantuml not found. Install it via: brew install plantuml or apt install plantuml',
       };
     }
     return { available: true };

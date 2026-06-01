@@ -1,33 +1,45 @@
 import fs from 'fs';
 import path from 'path';
+import { allProviderNames } from './providers';
 
-export type DiagramProvider = string;
+export type ProviderType = string;
 
 export interface Job {
   name: string;
-  type: DiagramProvider;
+  type: ProviderType;
 }
 
 export interface Config {
   jobs: Job[];
 }
 
-const DEFAULT_CONFIG: Config = {
-  jobs: [{ name: 'default', type: 'plantuml' }],
-};
+function buildDefaultConfig(): Config {
+  return {
+    jobs: allProviderNames().map((name) => ({ name, type: name })),
+  };
+}
 
 export function loadConfig(configPath: string): Config {
   const resolved = path.resolve(process.cwd(), configPath);
 
   if (!fs.existsSync(resolved)) {
-    return DEFAULT_CONFIG;
+    return buildDefaultConfig();
   }
 
-  const raw = fs.readFileSync(resolved, 'utf-8');
-  const parsed = JSON.parse(raw) as Partial<Config>;
+  let parsed: Partial<Config>;
 
-  return {
-    ...DEFAULT_CONFIG,
-    ...parsed,
-  };
+  try {
+    parsed = JSON.parse(fs.readFileSync(resolved, 'utf-8')) as Partial<Config>;
+  } catch {
+    throw new Error(`Failed to parse config file: ${resolved}`);
+  }
+  const defaults = buildDefaultConfig();
+
+  const configuredTypes = new Set((parsed.jobs ?? []).map((j) => j.type));
+  const mergedJobs = [
+    ...(parsed.jobs ?? []),
+    ...defaults.jobs.filter((j) => !configuredTypes.has(j.type)),
+  ];
+
+  return { jobs: mergedJobs };
 }

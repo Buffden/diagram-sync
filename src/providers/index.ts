@@ -1,7 +1,8 @@
 import { DiagramProvider } from './types';
 import { plantumlProvider } from './plantuml';
+import { mermaidProvider } from './mermaid';
 
-const registry: DiagramProvider[] = [plantumlProvider];
+const registry: DiagramProvider[] = [plantumlProvider, mermaidProvider];
 
 const extensionMap = new Map<string, DiagramProvider>();
 
@@ -17,4 +18,8 @@ export function getProvider(extension: string): DiagramProvider | undefined {
 
 export function allExtensions(): string[] {
   return [...extensionMap.keys()];
+}
+
+export function allProviderNames(): string[] {
+  return registry.map((p) => p.name);
 }
