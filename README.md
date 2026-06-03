@@ -48,6 +48,7 @@ npm install --save-dev diagram-sync
 ```text
 src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.svg
 docs/architecture/system.puml        →  diagrams/docs/architecture/system.svg
+docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
 ```
 
 Reference in your README:
@@ -91,7 +92,7 @@ npx diagram-sync --config diagram-sync.config.json
 ### Job Options
 
 | Field | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `name` | `string` | Label for the job (used in logs) |
 | `type` | `string` | Diagram provider (`plantuml`, `mermaid`) |
 
@@ -100,7 +101,7 @@ npx diagram-sync --config diagram-sync.config.json
 ## Supported Providers
 
 | Provider | Status |
-|---|---|
+| --- | --- |
 | PlantUML | Supported |
 | Mermaid | Supported |
 | Graphviz | Planned |
@@ -141,6 +142,7 @@ on:
   push:
     paths:
       - '**/*.puml'
+      - '**/*.mmd'
   workflow_dispatch:
 
 jobs:
@@ -155,18 +157,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends default-jre plantuml
 
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+
       - name: Generate diagrams
         run: npx diagram-sync
 ```
 
-> Triggers automatically when any `.puml` file is pushed. Also runnable manually from **GitHub → Actions → Generate Diagrams → Run workflow**.
+> Triggers automatically when any `.puml` or `.mmd` file is pushed. Also runnable manually from **GitHub → Actions → Generate Diagrams → Run workflow**.
 
 ### 4. CI/CD — generate and commit to main
 
 Generates SVGs and pushes them directly to `main`. Uses a PAT with admin privileges to bypass branch protection.
 
 **Flow:**
-1. Push a `.puml` change to any branch
+
+1. Push a `.puml` or `.mmd` change to any branch
 2. Workflow generates SVGs
 3. SVGs are committed and pushed directly to `main`
 
@@ -179,6 +185,7 @@ on:
   push:
     paths:
       - '**/*.puml'
+      - '**/*.mmd'
   workflow_dispatch:
 
 jobs:
@@ -194,6 +201,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends default-jre plantuml
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
 
       - name: Generate diagrams
         run: npx diagram-sync
