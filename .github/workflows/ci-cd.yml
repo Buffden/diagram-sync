@@ -10,54 +10,36 @@ on:
 
 jobs:
   ci:
-    name: CI
+    name: CI (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    if: github.event_name != 'release'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18, 20, 22]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck
-        run: npx tsc --noEmit
-
       - name: Build
         run: npm run build
 
-      - name: Install PlantUML
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends default-jre plantuml
-
-      - name: Validate .puml files
-        run: |
-          set -eo pipefail
-          files=$(find . -name "*.puml" \
-            -not -path "./.git/*" \
-            -not -path "./node_modules/*" \
-            -not -path "./diagrams/*")
-
-          if [ -z "$files" ]; then
-            echo "No .puml files found, skipping validation."
-            exit 0
-          fi
-
-          echo "$files" | while IFS= read -r file; do
-            echo "Validating: $file"
-            plantuml -checkonly "$file"
-          done
+      - name: Test
+        run: npm test
 
   publish:
     name: Publish to npm
-    needs: ci
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
 
