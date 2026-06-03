@@ -23,6 +23,7 @@ jobs:
 
       - name: Generate diagrams
         run: npx diagram-sync
+        # add --format svg or --format pdf to override the default png output
 
       - name: Commit generated diagrams
         run: |
