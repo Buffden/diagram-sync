@@ -36,15 +36,20 @@ describe('plantumlProvider.check', () => {
     expect(plantumlProvider.check().available).toBe(true);
   });
 
-  it('returns unavailable when plantuml is not found', () => {
-    mockSpawnSync.mockReturnValue({ status: 1, error: new Error('not found') } as any);
+  it('returns available when plantuml exits non-zero but binary exists (e.g. Graphviz missing)', () => {
+    mockSpawnSync.mockReturnValue({ status: 250, error: undefined } as any);
+    expect(plantumlProvider.check().available).toBe(true);
+  });
+
+  it('returns unavailable when plantuml binary is not found', () => {
+    mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
     const result = plantumlProvider.check();
     expect(result.available).toBe(false);
     expect(result.message).toBeDefined();
   });
 
   it('includes install hint in unavailable message', () => {
-    mockSpawnSync.mockReturnValue({ status: 1, error: new Error('not found') } as any);
+    mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
     const result = plantumlProvider.check();
     expect(result.message).toMatch(/plantuml/i);
   });
