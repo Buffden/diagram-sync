@@ -4,6 +4,24 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [2.0.0] — 2026-06-03
+
+### Breaking Changes
+
+- Default output format changed from SVG to **PNG**. Any references to generated images in READMEs or docs that use `.svg` paths must be updated to `.png` (or the appropriate format).
+
+**Migration:** If you relied on SVG output without explicit config, add `"format": "svg"` to your `diagram-sync.config.json` or run with `--format svg`.
+
+### Added
+
+- Configurable output format for all providers via `--format` CLI flag, global `format` config field, or per-job `format` field
+- Format resolution chain: `--format` flag → job `format` → global `format` → default `png`
+- PlantUML supports: `png`, `svg`, `eps`, `pdf`
+- Mermaid supports: `png`, `svg`, `pdf`
+- Using an unsupported format explicitly (via flag or config) is a hard error; falling back from an unsupported default produces a warning and uses the provider's own default instead
+
+---
+
 ## [1.1.0] — 2026-06-01
 
 ### Added

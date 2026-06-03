@@ -46,15 +46,15 @@ npm install --save-dev diagram-sync
 3. Find the generated image in `diagrams/` mirroring the source path
 
 ```text
-src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.svg
-docs/architecture/system.puml        →  diagrams/docs/architecture/system.svg
-docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
+src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.png
+docs/architecture/system.puml        →  diagrams/docs/architecture/system.png
+docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.png
 ```
 
 Reference in your README:
 
 ```markdown
-![System Architecture](diagrams/docs/architecture/system.svg)
+![System Architecture](diagrams/docs/architecture/system.png)
 ```
 
 ---
@@ -64,7 +64,7 @@ Reference in your README:
 - Recursively scans your repo for diagram source files
 - Skips `node_modules`, `.git`, `dist`, `build`, `diagrams`
 - Derives the output path from the source file location — no input/output directories to configure
-- Generates images using the installed diagram tool for each provider — output format depends on the provider (SVG, PNG, or other)
+- Generates images using the installed diagram tool for each provider — defaults to PNG, configurable via `--format` flag or config file
 
 ---
 
@@ -76,18 +76,30 @@ Optionally add `diagram-sync.config.json` to your project root:
 
 ```json
 {
+  "format": "svg",
   "jobs": [
     {
       "name": "architecture",
-      "type": "plantuml"
+      "type": "plantuml",
+      "format": "pdf"
     }
   ]
 }
 ```
 
+Load the config file:
+
 ```bash
 npx diagram-sync --config diagram-sync.config.json
 ```
+
+Override format at runtime:
+
+```bash
+npx diagram-sync --format svg
+```
+
+Format resolution order: `--format` flag → job `format` → global `format` → default `png`.
 
 ### Job Options
 
@@ -95,6 +107,7 @@ npx diagram-sync --config diagram-sync.config.json
 | --- | --- | --- |
 | `name` | `string` | Label for the job (used in logs) |
 | `type` | `string` | Diagram provider (e.g. `plantuml`, `mermaid`) — see Supported Providers for all values |
+| `format` | `string` | Output format for this job (e.g. `png`, `svg`, `pdf`) — overrides global format |
 
 ---
 
