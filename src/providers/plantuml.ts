@@ -16,7 +16,7 @@ export const plantumlProvider: DiagramProvider = {
 
   check() {
     const result = spawnSync('plantuml', ['-version'], { encoding: 'utf-8' });
-    if (result.error || result.status !== 0) {
+    if (result.error) {
       return {
         available: false,
         message: 'plantuml not found. Install it via: brew install plantuml or apt install plantuml',
