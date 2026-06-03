@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { log } from './logger';
 import { getProvider } from './providers';
+import { Config, Job, resolveFormat } from './config';
 import { DiagramProvider } from './providers/types';
 
 const availableProviders = new Set<DiagramProvider>();
@@ -20,13 +21,17 @@ function isAvailable(provider: DiagramProvider): boolean {
   return true;
 }
 
-export function generateDiagrams(files: string[], root: string): void {
+function getJob(config: Config, providerName: string): Job | undefined {
+  return config.jobs.find((j) => j.type === providerName);
+}
+
+export function generateDiagrams(files: string[], root: string, config: Config, cliFormat?: string): void {
   if (files.length === 0) {
     log.warn('No diagram source files found.');
     return;
   }
 
-  log.info(`Found ${files.length} diagram file(s). Generating SVGs...`);
+  log.info(`Found ${files.length} diagram file(s). Generating images...`);
 
   let success = 0;
   let failed = 0;
@@ -46,13 +51,31 @@ export function generateDiagrams(files: string[], root: string): void {
       continue;
     }
 
+    const job = getJob(config, provider.name);
+    const resolvedFormat = resolveFormat(job ?? { name: provider.name, type: provider.name }, config, cliFormat);
+    const isExplicit = !!(cliFormat ?? job?.format ?? config.format);
+
+    let format: string;
+    if (!provider.supportedFormats.includes(resolvedFormat)) {
+      if (isExplicit) {
+        log.error(`Failed: ${relative}`);
+        console.error(`${provider.name} does not support format "${resolvedFormat}". Supported: ${provider.supportedFormats.join(', ')}`);
+        failed++;
+        continue;
+      }
+      log.warn(`${provider.name} does not support "${resolvedFormat}", using "${provider.defaultFormat}" instead`);
+      format = provider.defaultFormat;
+    } else {
+      format = resolvedFormat;
+    }
+
     const outputDir = path.join(root, 'diagrams', path.dirname(relative));
     fs.mkdirSync(outputDir, { recursive: true });
 
-    const outputFile = `diagrams/${relative.replace(/\.[^.]+$/, '.svg')}`;
+    const outputFile = `diagrams/${relative.replace(/\.[^.]+$/, '.' + format)}`;
 
     try {
-      provider.generate(file, outputDir);
+      provider.generate(file, outputDir, format);
       log.success(`Generated: ${outputFile}`);
       success++;
     } catch (err) {
