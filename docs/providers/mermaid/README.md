@@ -1,6 +1,6 @@
 # Mermaid Provider
 
-Renders `.mmd` and `.mermaid` files to SVG using the Mermaid CLI (`mmdc`).
+Renders `.mmd` and `.mermaid` files using the Mermaid CLI (`mmdc`). Output format is configurable — defaults to `png`.
 
 ---
 
@@ -27,37 +27,60 @@ mmdc --version
 
 ---
 
+## Supported Output Formats
+
+| Format | Default |
+| --- | --- |
+| `png` | Yes |
+| `svg` | — |
+| `pdf` | — |
+
+---
+
 ## Output
 
-SVG files generated under `diagrams/`, mirroring the source path.
+Images generated under `diagrams/`, mirroring the source path.
 
 ```text
-docs/flows/auth.mmd          →  diagrams/docs/flows/auth.svg
-src/architecture/system.mmd  →  diagrams/src/architecture/system.svg
+docs/flows/auth.mmd          →  diagrams/docs/flows/auth.png
+src/architecture/system.mmd  →  diagrams/src/architecture/system.png
 ```
 
 ---
 
 ## Config
 
-No config required. Mermaid files are discovered and rendered automatically.
+No config required. Mermaid files are discovered and rendered automatically in `png`.
 
-To run Mermaid jobs explicitly via config:
+To set a global output format:
+
+```json
+{
+  "format": "svg"
+}
+```
+
+To set format per job:
 
 ```json
 {
   "jobs": [
     {
       "name": "flows",
-      "type": "mermaid"
+      "type": "mermaid",
+      "format": "svg"
     }
   ]
 }
 ```
 
+To override at runtime:
+
 ```bash
-npx diagram-sync --config diagram-sync.config.json
+npx diagram-sync --format pdf
 ```
+
+Format resolution order: `--format` flag → job `format` → global `format` → default `png`.
 
 ---
 
@@ -70,11 +93,7 @@ npx diagram-sync --config diagram-sync.config.json
 
 Copy the relevant file into `.github/workflows/` in your repo.
 
----
-
-## Example
-
-See [`example.mmd`](./example.mmd) for a working Mermaid source file.
+`workflow-commit.yml` requires a Personal Access Token (PAT) with `contents: write` permission saved as a repository secret named `PAT_TOKEN`. [How to create a PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
 ---
 
