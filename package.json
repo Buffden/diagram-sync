@@ -1,6 +1,6 @@
 {
   "name": "diagram-sync",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Automatically export diagrams from PlantUML and Mermaid source files — keeps architecture documentation in sync with code across CI/CD pipelines, npm scripts, and local workflows.",
   "bin": {
     "diagram-sync": "dist/index.js"
