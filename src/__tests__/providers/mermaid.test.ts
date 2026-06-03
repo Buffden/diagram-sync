@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { spawnSync } from 'child_process';
 
 vi.mock('child_process');
+vi.mock('fs');
 
 import { mermaidProvider } from '../../providers/mermaid';
 
@@ -9,6 +10,11 @@ const mockSpawnSync = vi.mocked(spawnSync);
 
 beforeEach(() => {
   mockSpawnSync.mockReset();
+  delete process.env.CI;
+});
+
+afterEach(() => {
+  delete process.env.CI;
 });
 
 describe('mermaidProvider metadata', () => {
@@ -105,5 +111,20 @@ describe('mermaidProvider.generate', () => {
   it('throws with error message when spawn fails', () => {
     mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
     expect(() => mermaidProvider.generate('/repo/flow.mmd', '/out', 'png')).toThrow('ENOENT');
+  });
+
+  it('passes --no-sandbox puppeteer config when CI env is set', () => {
+    process.env.CI = 'true';
+    mockSpawnSync.mockReturnValue({ status: 0 } as any);
+    mermaidProvider.generate('/repo/flow.mmd', '/repo/diagrams', 'png');
+    const args = mockSpawnSync.mock.calls[0][1] as string[];
+    expect(args).toContain('-p');
+  });
+
+  it('does not pass puppeteer config when CI env is not set', () => {
+    mockSpawnSync.mockReturnValue({ status: 0 } as any);
+    mermaidProvider.generate('/repo/flow.mmd', '/repo/diagrams', 'png');
+    const args = mockSpawnSync.mock.calls[0][1] as string[];
+    expect(args).not.toContain('-p');
   });
 });
