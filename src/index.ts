@@ -17,11 +17,12 @@ program
   .description('Keep architecture diagrams synchronized with source code.')
   .version(version)
   .option('-c, --config <path>', 'path to config file', 'diagram-sync.config.json')
-  .action((options: { config: string }) => {
+  .option('-f, --format <format>', 'output format override (png, svg, pdf, ...)')
+  .action((options: { config: string; format?: string }) => {
     const root = process.cwd();
     const config = loadConfig(options.config);
     const files = discoverFiles(root, config);
-    generateDiagrams(files, root);
+    generateDiagrams(files, root, config, options.format);
   });
 
 program.parse();
