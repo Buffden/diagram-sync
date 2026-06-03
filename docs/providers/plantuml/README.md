@@ -1,6 +1,6 @@
 # PlantUML Provider
 
-Renders `.puml` and `.plantuml` files to SVG using the `plantuml` CLI.
+Renders `.puml` and `.plantuml` files using the `plantuml` CLI. Output format is configurable — defaults to `png`.
 
 ---
 
@@ -34,37 +34,61 @@ Download from [plantuml.com](https://plantuml.com/download) and ensure `plantuml
 
 ---
 
+## Supported Output Formats
+
+| Format | Default |
+| --- | --- |
+| `png` | Yes |
+| `svg` | — |
+| `eps` | — |
+| `pdf` | — |
+
+---
+
 ## Output
 
-SVG files generated under `diagrams/`, mirroring the source path.
+Images generated under `diagrams/`, mirroring the source path.
 
 ```text
-src/services/auth/flow.puml   →  diagrams/src/services/auth/flow.svg
-docs/architecture/system.puml →  diagrams/docs/architecture/system.svg
+src/services/auth/flow.puml   →  diagrams/src/services/auth/flow.png
+docs/architecture/system.puml →  diagrams/docs/architecture/system.png
 ```
 
 ---
 
 ## Config
 
-No config required. PlantUML files are discovered and rendered automatically.
+No config required. PlantUML files are discovered and rendered automatically in `png`.
 
-To run PlantUML jobs explicitly via config:
+To set a global output format:
+
+```json
+{
+  "format": "svg"
+}
+```
+
+To set format per job:
 
 ```json
 {
   "jobs": [
     {
       "name": "architecture",
-      "type": "plantuml"
+      "type": "plantuml",
+      "format": "svg"
     }
   ]
 }
 ```
 
+To override at runtime:
+
 ```bash
-npx diagram-sync --config diagram-sync.config.json
+npx diagram-sync --format pdf
 ```
+
+Format resolution order: `--format` flag → job `format` → global `format` → default `png`.
 
 ---
 
@@ -77,11 +101,7 @@ npx diagram-sync --config diagram-sync.config.json
 
 Copy the relevant file into `.github/workflows/` in your repo.
 
----
-
-## Example
-
-See [`example.puml`](./example.puml) for a working PlantUML source file.
+`workflow-commit.yml` requires a Personal Access Token (PAT) with `contents: write` permission saved as a repository secret named `PAT_TOKEN`. [How to create a PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
 ---
 
