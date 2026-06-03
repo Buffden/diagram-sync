@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [2.0.2] — 2026-06-03
+
+### Fixed
+
+- Mermaid CLI automatically uses `--no-sandbox` when running in CI environments — no manual workflow workaround needed
+
+---
+
 ## [2.0.1] — 2026-06-03
 
 ### Fixed
