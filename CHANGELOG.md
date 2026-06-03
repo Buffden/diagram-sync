@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [2.0.1] — 2026-06-03
+
+### Fixed
+
+- PlantUML availability check no longer fails when Graphviz is not installed — `plantuml` exits with code 250 in this case but is otherwise fully functional
+
+---
+
 ## [2.0.0] — 2026-06-03
 
 ### Breaking Changes
