@@ -16,7 +16,7 @@ brew install openjdk plantuml
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y --no-install-recommends default-jre plantuml
+sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
 ```
 
 ### Windows
@@ -92,16 +92,11 @@ Format resolution order: `--format` flag → job `format` → global `format` �
 
 ---
 
-## CI/CD Workflows
+## CI/CD
 
-| Workflow | Description |
-| --- | --- |
-| [`workflow-generate.yml`](./workflow-generate.yml) | Generate images on push — files exist only in the runner |
-| [`workflow-commit.yml`](./workflow-commit.yml) | Generate images and commit them directly to `main` |
+Copy [`workflow.yml`](../workflow.yml) into `.github/workflows/` in your repo. It generates images on every push and commits them back automatically.
 
-Copy the relevant file into `.github/workflows/` in your repo.
-
-`workflow-commit.yml` requires a Personal Access Token (PAT) with `contents: write` permission saved as a repository secret named `PAT_TOKEN`. [How to create a PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+Requires a Personal Access Token (PAT) with `contents: write` permission saved as a repository secret named `PAT_TOKEN`. [How to create a PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
 ---
 
