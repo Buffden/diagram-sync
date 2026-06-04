@@ -193,6 +193,7 @@ jobs:
 
       - name: Generate diagrams
         run: npx diagram-sync
+        # add --format svg or --format pdf to override the default png output
 
       - name: Commit generated diagrams
         run: |
@@ -213,7 +214,7 @@ Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets.
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 20+
 - Each provider requires its own CLI tool — install only what you need:
   - **PlantUML:** Java 11+ and PlantUML — see [PlantUML guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/plantuml)
   - **Mermaid:** see [Mermaid guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/mermaid)
