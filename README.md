@@ -160,15 +160,18 @@ npm run diagrams
 
 ### 3. CI/CD
 
-Generates diagram images on every push. The example below uses PlantUML:
+Generates and commits diagram images on every push:
 
 ```yaml
-name: Generate Diagrams
+name: Generate and Commit Diagrams
 
 on:
   push:
     paths:
       - '**/*.puml'
+      - '**/*.plantuml'
+      - '**/*.mmd'
+      - '**/*.mermaid'
   workflow_dispatch:
 
 jobs:
@@ -176,18 +179,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Install PlantUML
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends default-jre plantuml
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
 
       - name: Generate diagrams
         run: npx diagram-sync
+
+      - name: Commit generated diagrams
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add diagrams/
+          if git diff --staged --quiet; then
+            echo "No diagram changes to commit."
+          else
+            git commit -m "chore: auto-export diagrams [skip ci]"
+            git push
+          fi
 ```
 
-For complete CI/CD workflows per provider — including generate-only and generate-and-commit variants — see the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)**.
+Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets. See the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)** for the ready-to-use workflow file.
 
 ---
 
