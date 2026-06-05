@@ -36,15 +36,9 @@ Download from [graphviz.org](https://graphviz.org/download/) and ensure `dot` is
 
 ## Supported Output Formats
 
-| Format | Default |
-| --- | --- |
-| `png` | — |
-| `svg` | Yes |
-| `eps` | — |
-| `pdf` | — |
-| `jpg` | — |
-| `jpeg` | — |
-| `gif` | — |
+All formats are fully supported. Default is `svg`.
+
+`svg` `png` `eps` `pdf` `jpg` `jpeg` `gif`
 
 ---
 
