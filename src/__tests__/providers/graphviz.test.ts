@@ -21,8 +21,8 @@ describe('graphvizProvider metadata', () => {
     expect(graphvizProvider.extensions).toContain('.gv');
   });
 
-  it('supports png, svg, eps, pdf formats', () => {
-    expect(graphvizProvider.supportedFormats).toEqual(expect.arrayContaining(['png', 'svg', 'eps', 'pdf']));
+  it('supports png, svg, eps, pdf, jpg, jpeg, gif formats', () => {
+    expect(graphvizProvider.supportedFormats).toEqual(expect.arrayContaining(['png', 'svg', 'eps', 'pdf', 'jpg', 'jpeg', 'gif']));
   });
 
   it('defaults to svg', () => {
@@ -82,7 +82,7 @@ describe('graphvizProvider.generate', () => {
   });
 
   it('throws on unsupported format', () => {
-    expect(() => graphvizProvider.generate('/repo/arch.dot', '/out', 'gif')).toThrow(
+    expect(() => graphvizProvider.generate('/repo/arch.dot', '/out', 'webp')).toThrow(
       /does not support format/,
     );
   });

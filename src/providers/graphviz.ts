@@ -5,7 +5,7 @@ import path from 'path';
 export const graphvizProvider: DiagramProvider = {
     name: 'graphviz',
     extensions: ['.dot', '.gv'],
-    supportedFormats: ['png', 'svg', 'eps', 'pdf'],
+    supportedFormats: ['png', 'svg', 'eps', 'pdf', 'jpg', 'jpeg', 'gif'],
     defaultFormat: 'svg',
 
     check() {
