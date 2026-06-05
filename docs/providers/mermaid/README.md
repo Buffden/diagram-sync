@@ -29,11 +29,9 @@ mmdc --version
 
 ## Supported Output Formats
 
-| Format | Default |
-| --- | --- |
-| `png` | — |
-| `svg` | Yes |
-| `pdf` | — |
+All formats are fully supported. Default is `svg`.
+
+`svg` `png` `pdf`
 
 ---
 

@@ -36,12 +36,9 @@ Download from [plantuml.com](https://plantuml.com/download) and ensure `plantuml
 
 ## Supported Output Formats
 
-| Format | Default |
-| --- | --- |
-| `png` | — |
-| `svg` | Yes |
-| `eps` | — |
-| `pdf` | — |
+All formats are fully supported. Default is `svg`.
+
+`svg` `png` `eps` `pdf`
 
 ---
 
