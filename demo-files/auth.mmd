@@ -1,0 +1,5 @@
+graph TD
+    A[User] -->|Login| B[Auth Service]
+    B -->|Validate| C[Database]
+    C -->|Token| B
+    B -->|JWT| A

@@ -1,0 +1,8 @@
+digraph infra {
+    rankdir=LR
+    Client -> LoadBalancer
+    LoadBalancer -> API1
+    LoadBalancer -> API2
+    API1 -> Database
+    API2 -> Database
+}
