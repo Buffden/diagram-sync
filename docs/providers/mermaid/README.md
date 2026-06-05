@@ -1,6 +1,6 @@
 # Mermaid Provider
 
-Renders `.mmd` and `.mermaid` files using the Mermaid CLI (`mmdc`). Output format is configurable — defaults to `png`.
+Renders `.mmd` and `.mermaid` files using the Mermaid CLI (`mmdc`). Output format is configurable — defaults to `svg`.
 
 ---
 
@@ -31,8 +31,8 @@ mmdc --version
 
 | Format | Default |
 | --- | --- |
-| `png` | Yes |
-| `svg` | — |
+| `png` | — |
+| `svg` | Yes |
 | `pdf` | — |
 
 ---
@@ -42,15 +42,15 @@ mmdc --version
 Images generated under `diagrams/`, mirroring the source path.
 
 ```text
-docs/flows/auth.mmd          →  diagrams/docs/flows/auth.png
-src/architecture/system.mmd  →  diagrams/src/architecture/system.png
+docs/flows/auth.mmd          →  diagrams/docs/flows/auth.svg
+src/architecture/system.mmd  →  diagrams/src/architecture/system.svg
 ```
 
 ---
 
 ## Config
 
-No config required. Mermaid files are discovered and rendered automatically in `png`.
+No config required. Mermaid files are discovered and rendered automatically in `svg`.
 
 To set a global output format:
 
@@ -80,7 +80,7 @@ To override at runtime:
 npx diagram-sync --format pdf
 ```
 
-Format resolution order: `--format` flag → job `format` → global `format` → default `png`.
+Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
 
 ---
 

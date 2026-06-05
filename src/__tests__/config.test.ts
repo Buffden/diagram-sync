@@ -28,8 +28,8 @@ describe('resolveFormat', () => {
     expect(resolveFormat(job, { ...config, format: 'pdf' })).toBe('pdf');
   });
 
-  it('returns png as system default when nothing is set', () => {
-    expect(resolveFormat(job, config)).toBe('png');
+  it('returns svg as system default when nothing is set', () => {
+    expect(resolveFormat(job, config)).toBe('svg');
   });
 });
 

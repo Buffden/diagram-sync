@@ -46,15 +46,15 @@ npm install --save-dev diagram-sync
 3. Find the generated image in `diagrams/` mirroring the source path
 
 ```text
-src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.png
-docs/architecture/system.puml        →  diagrams/docs/architecture/system.png
-docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.png
+src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.svg
+docs/architecture/system.puml        →  diagrams/docs/architecture/system.svg
+docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
 ```
 
 Reference in your README:
 
 ```markdown
-![System Architecture](diagrams/docs/architecture/system.png)
+![System Architecture](diagrams/docs/architecture/system.svg)
 ```
 
 ---
@@ -64,7 +64,7 @@ Reference in your README:
 - Recursively scans your repo for diagram source files
 - Skips `node_modules`, `.git`, `dist`, `build`, `diagrams`
 - Derives the output path from the source file location — no input/output directories to configure
-- Generates images using the installed diagram tool for each provider — defaults to PNG, configurable via `--format` flag or config file
+- Generates images using the installed diagram tool for each provider — defaults to SVG, configurable via `--format` flag or config file
 
 ---
 
@@ -99,7 +99,7 @@ Override format at runtime:
 npx diagram-sync --format svg
 ```
 
-Format resolution order: `--format` flag → job `format` → global `format` → default `png`.
+Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
 
 ### Job Options
 
@@ -193,7 +193,7 @@ jobs:
 
       - name: Generate diagrams
         run: npx diagram-sync
-        # add --format svg or --format pdf to override the default png output
+        # add --format png or --format pdf to override the default svg output
 
       - name: Commit generated diagrams
         run: |

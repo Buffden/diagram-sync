@@ -31,8 +31,8 @@ describe('mermaidProvider metadata', () => {
     expect(mermaidProvider.supportedFormats).toEqual(expect.arrayContaining(['png', 'svg', 'pdf']));
   });
 
-  it('defaults to png', () => {
-    expect(mermaidProvider.defaultFormat).toBe('png');
+  it('defaults to svg', () => {
+    expect(mermaidProvider.defaultFormat).toBe('svg');
   });
 });
 
