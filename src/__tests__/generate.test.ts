@@ -17,8 +17,8 @@ vi.mock('../logger', () => ({
 
 vi.mock('../providers', () => ({
   getProvider: vi.fn(),
-  allExtensions: vi.fn(() => ['.puml', '.mmd']),
-  allProviderNames: vi.fn(() => ['plantuml', 'mermaid']),
+  allExtensions: vi.fn(() => ['.puml', '.mmd', '.dot', '.gv']),
+  allProviderNames: vi.fn(() => ['plantuml', 'mermaid', 'graphviz']),
 }));
 
 import { getProvider } from '../providers';
