@@ -5,6 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
 [![npm downloads](https://img.shields.io/npm/dw/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
 [![license](https://img.shields.io/npm/l/diagram-sync)](./LICENSE)
+[![coverage](https://coveralls.io/repos/github/Buffden/diagram-sync/badge.svg?branch=main)](https://coveralls.io/github/Buffden/diagram-sync?branch=main)
 
 `diagram-sync` is a CLI tool that automatically generates images from diagram source files. Drop it into any repo and run `npx diagram-sync` — it finds every supported diagram file, renders it to an image, and mirrors the output under a `diagrams/` folder. No config required.
 
