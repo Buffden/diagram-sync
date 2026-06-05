@@ -4,6 +4,15 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.1.0] — 2026-06-05
+
+### Added
+
+- Graphviz provider: supports `.dot` and `.gv` files via the `dot` CLI
+- Graphviz output formats: `png`, `svg`, `eps`, `pdf`, `jpg`, `jpeg`, `gif` — defaults to `svg`
+
+---
+
 ## [3.0.0] — 2026-06-04
 
 ### Changed

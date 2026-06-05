@@ -7,6 +7,8 @@ on:
       - '**/*.plantuml'
       - '**/*.mmd'
       - '**/*.mermaid'
+      - '**/*.dot'
+      - '**/*.gv'
   workflow_dispatch:
 
 jobs:
@@ -26,9 +28,12 @@ jobs:
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
 
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
+
       - name: Generate diagrams
         run: npx diagram-sync
-        # add --format svg or --format pdf to override the default svg output
+        # add --format png or --format pdf to override the default svg output
 
       - name: Commit generated diagrams
         run: |

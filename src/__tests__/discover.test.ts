@@ -48,6 +48,20 @@ describe('discoverFiles', () => {
     expect(files[0]).toMatch(/arch\.plantuml$/);
   });
 
+  it('finds .dot files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'arch.dot'), 'digraph {}');
+    const files = discoverFiles(tmpDir, makeConfig(['graphviz']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/arch\.dot$/);
+  });
+
+  it('finds .gv files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'pipeline.gv'), 'digraph {}');
+    const files = discoverFiles(tmpDir, makeConfig(['graphviz']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/pipeline\.gv$/);
+  });
+
   it('finds files in subdirectories', () => {
     const subDir = path.join(tmpDir, 'src', 'flows');
     fs.mkdirSync(subDir, { recursive: true });
@@ -97,7 +111,8 @@ describe('discoverFiles', () => {
   it('finds files across multiple active providers', () => {
     fs.writeFileSync(path.join(tmpDir, 'flow.puml'), '@startuml\n@enduml');
     fs.writeFileSync(path.join(tmpDir, 'chart.mmd'), 'graph TD');
-    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid']));
-    expect(files).toHaveLength(2);
+    fs.writeFileSync(path.join(tmpDir, 'arch.dot'), 'digraph {}');
+    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz']));
+    expect(files).toHaveLength(3);
   });
 });

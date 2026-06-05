@@ -55,6 +55,7 @@ describe('loadConfig', () => {
     const types = config.jobs.map((j) => j.type);
     expect(types).toContain('plantuml');
     expect(types).toContain('mermaid');
+    expect(types).toContain('graphviz');
   });
 
   it('parses a valid config file', () => {
@@ -81,6 +82,7 @@ describe('loadConfig', () => {
     }));
     const config = loadConfig(configPath);
     expect(config.jobs.some((j) => j.type === 'mermaid')).toBe(true);
+    expect(config.jobs.some((j) => j.type === 'graphviz')).toBe(true);
   });
 
   it('does not duplicate providers already in user config', () => {
@@ -94,5 +96,6 @@ describe('loadConfig', () => {
     const config = loadConfig(configPath);
     expect(config.jobs.filter((j) => j.type === 'plantuml')).toHaveLength(1);
     expect(config.jobs.filter((j) => j.type === 'mermaid')).toHaveLength(1);
+    expect(config.jobs.filter((j) => j.type === 'graphviz')).toHaveLength(1);
   });
 });
