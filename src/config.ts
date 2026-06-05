@@ -15,7 +15,7 @@ export interface Config {
   jobs: Job[];
 }
 
-const SYSTEM_DEFAULT_FORMAT = 'png';
+const SYSTEM_DEFAULT_FORMAT = 'svg';
 
 function buildDefaultConfig(): Config {
   return {

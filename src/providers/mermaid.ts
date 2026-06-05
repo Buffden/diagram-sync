@@ -8,7 +8,7 @@ export const mermaidProvider: DiagramProvider = {
   name: 'mermaid',
   extensions: ['.mmd', '.mermaid'],
   supportedFormats: ['png', 'svg', 'pdf'],
-  defaultFormat: 'png',
+  defaultFormat: 'svg',
 
   check() {
     const result = spawnSync('mmdc', ['--version'], { encoding: 'utf-8' });

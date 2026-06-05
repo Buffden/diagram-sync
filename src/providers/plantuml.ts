@@ -12,7 +12,7 @@ export const plantumlProvider: DiagramProvider = {
   name: 'plantuml',
   extensions: ['.puml', '.plantuml'],
   supportedFormats: ['png', 'svg', 'eps', 'pdf'],
-  defaultFormat: 'png',
+  defaultFormat: 'svg',
 
   check() {
     const result = spawnSync('plantuml', ['-version'], { encoding: 'utf-8' });

@@ -1,6 +1,6 @@
 # PlantUML Provider
 
-Renders `.puml` and `.plantuml` files using the `plantuml` CLI. Output format is configurable — defaults to `png`.
+Renders `.puml` and `.plantuml` files using the `plantuml` CLI. Output format is configurable — defaults to `svg`.
 
 ---
 
@@ -38,8 +38,8 @@ Download from [plantuml.com](https://plantuml.com/download) and ensure `plantuml
 
 | Format | Default |
 | --- | --- |
-| `png` | Yes |
-| `svg` | — |
+| `png` | — |
+| `svg` | Yes |
 | `eps` | — |
 | `pdf` | — |
 
@@ -50,15 +50,15 @@ Download from [plantuml.com](https://plantuml.com/download) and ensure `plantuml
 Images generated under `diagrams/`, mirroring the source path.
 
 ```text
-src/services/auth/flow.puml   →  diagrams/src/services/auth/flow.png
-docs/architecture/system.puml →  diagrams/docs/architecture/system.png
+src/services/auth/flow.puml   →  diagrams/src/services/auth/flow.svg
+docs/architecture/system.puml →  diagrams/docs/architecture/system.svg
 ```
 
 ---
 
 ## Config
 
-No config required. PlantUML files are discovered and rendered automatically in `png`.
+No config required. PlantUML files are discovered and rendered automatically in `svg`.
 
 To set a global output format:
 
@@ -88,7 +88,7 @@ To override at runtime:
 npx diagram-sync --format pdf
 ```
 
-Format resolution order: `--format` flag → job `format` → global `format` → default `png`.
+Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
 
 ---
 

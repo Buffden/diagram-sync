@@ -64,7 +64,7 @@ describe('generateDiagrams', () => {
     const provider = makeMockProvider({ name: 'mock' });
     mockGetProvider.mockReturnValue(provider);
     generateDiagrams(['/repo/flow.mock'], root, config);
-    expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'png');
+    expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'svg');
   });
 
   it('uses cli format when provided', () => {
@@ -93,14 +93,14 @@ describe('generateDiagrams', () => {
   it('warns and falls back to provider default when system default is unsupported', () => {
     const provider = makeMockProvider({
       name: 'mock',
-      supportedFormats: ['svg'],
-      defaultFormat: 'svg',
+      supportedFormats: ['png'],
+      defaultFormat: 'png',
     });
     mockGetProvider.mockReturnValue(provider);
-    // no explicit format — system default 'png' is unsupported by this provider
+    // no explicit format — system default 'svg' is unsupported by this provider
     generateDiagrams(['/repo/flow.mock'], root, config);
     expect(mockLog.warn).toHaveBeenCalledWith(expect.stringMatching(/does not support/i));
-    expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'svg');
+    expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'png');
   });
 
   it('counts failed files when provider is unavailable', () => {

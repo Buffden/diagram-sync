@@ -25,8 +25,8 @@ describe('plantumlProvider metadata', () => {
     expect(plantumlProvider.supportedFormats).toEqual(expect.arrayContaining(['png', 'svg', 'eps', 'pdf']));
   });
 
-  it('defaults to png', () => {
-    expect(plantumlProvider.defaultFormat).toBe('png');
+  it('defaults to svg', () => {
+    expect(plantumlProvider.defaultFormat).toBe('svg');
   });
 });
 

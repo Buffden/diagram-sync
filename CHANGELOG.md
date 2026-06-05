@@ -4,6 +4,16 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.0.0] — 2026-06-04
+
+### Changed
+
+- Default output format reverted to **SVG** (was changed to PNG in 2.0.0). SVG is the recommended format — scalable, smaller, and renderable inline in GitHub READMEs.
+
+**Migration:** If you relied on PNG output without explicit config, add `"format": "png"` to your `diagram-sync.config.json` or run with `--format png`.
+
+---
+
 ## [2.0.2] — 2026-06-03
 
 ### Fixed
