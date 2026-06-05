@@ -161,13 +161,22 @@ npm run diagrams
 
 ### 3. CI/CD
 
-Generates and commits diagram images on every push:
+Generates a preview on every PR and commits images to `main` on merge:
 
 ```yaml
 name: Generate and Commit Diagrams
 
 on:
+  pull_request:
+    paths:
+      - '**/*.puml'
+      - '**/*.plantuml'
+      - '**/*.mmd'
+      - '**/*.mermaid'
+      - '**/*.dot'
+      - '**/*.gv'
   push:
+    branches: [main]
     paths:
       - '**/*.puml'
       - '**/*.plantuml'
@@ -178,8 +187,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate:
+  preview:
+    name: Generate Preview
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
+
+      - name: Generate diagrams
+        run: npx diagram-sync
+        # add --format png or --format pdf to override the default svg output
+
+      - name: Upload diagram previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagrams-preview
+          path: diagrams/
+
+  commit:
+    name: Generate and Commit
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
       - uses: actions/checkout@v5
