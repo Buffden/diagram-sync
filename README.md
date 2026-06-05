@@ -13,6 +13,8 @@
 npx diagram-sync
 ```
 
+![demo](https://raw.githubusercontent.com/Buffden/diagram-sync/main/demo.gif)
+
 ---
 
 ## The Problem
