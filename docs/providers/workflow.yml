@@ -13,6 +13,8 @@ on:
       - '**/*.dio'
       - '**/*.d2'
       - '**/*.excalidraw'
+      - '**/*.bpmn'
+      - '**/*.er'
   push:
     branches: [main]
     paths:
@@ -26,6 +28,8 @@ on:
       - '**/*.dio'
       - '**/*.d2'
       - '**/*.excalidraw'
+      - '**/*.bpmn'
+      - '**/*.er'
   workflow_dispatch:
 
 jobs:
@@ -61,6 +65,18 @@ jobs:
         run: |
           npm install -g excalidraw-export-cli
           npx playwright install chromium
+
+      - name: Install BPMN CLI
+        run: |
+          npm install -g bpmn-to-image
+          npx playwright install chromium
+
+      - name: Install ERD
+        run: |
+          ERD_VERSION=$(curl -s https://api.github.com/repos/BurntSushi/erd/releases/latest | jq -r '.tag_name')
+          wget -q "https://github.com/BurntSushi/erd/releases/download/${ERD_VERSION}/erd-${ERD_VERSION}-linux.tar.gz" -O erd.tar.gz
+          tar -xzf erd.tar.gz
+          sudo mv erd /usr/local/bin/erd
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -106,6 +122,18 @@ jobs:
         run: |
           npm install -g excalidraw-export-cli
           npx playwright install chromium
+
+      - name: Install BPMN CLI
+        run: |
+          npm install -g bpmn-to-image
+          npx playwright install chromium
+
+      - name: Install ERD
+        run: |
+          ERD_VERSION=$(curl -s https://api.github.com/repos/BurntSushi/erd/releases/latest | jq -r '.tag_name')
+          wget -q "https://github.com/BurntSushi/erd/releases/download/${ERD_VERSION}/erd-${ERD_VERSION}-linux.tar.gz" -O erd.tar.gz
+          tar -xzf erd.tar.gz
+          sudo mv erd /usr/local/bin/erd
 
       - name: Generate diagrams
         run: npx diagram-sync
