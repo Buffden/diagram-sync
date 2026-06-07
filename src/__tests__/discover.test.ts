@@ -62,6 +62,20 @@ describe('discoverFiles', () => {
     expect(files[0]).toMatch(/pipeline\.gv$/);
   });
 
+  it('finds .drawio files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'arch.drawio'), '<mxfile/>');
+    const files = discoverFiles(tmpDir, makeConfig(['drawio']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/arch\.drawio$/);
+  });
+
+  it('finds .dio files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'flow.dio'), '<mxfile/>');
+    const files = discoverFiles(tmpDir, makeConfig(['drawio']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/flow\.dio$/);
+  });
+
   it('finds files in subdirectories', () => {
     const subDir = path.join(tmpDir, 'src', 'flows');
     fs.mkdirSync(subDir, { recursive: true });
@@ -112,7 +126,8 @@ describe('discoverFiles', () => {
     fs.writeFileSync(path.join(tmpDir, 'flow.puml'), '@startuml\n@enduml');
     fs.writeFileSync(path.join(tmpDir, 'chart.mmd'), 'graph TD');
     fs.writeFileSync(path.join(tmpDir, 'arch.dot'), 'digraph {}');
-    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz']));
-    expect(files).toHaveLength(3);
+    fs.writeFileSync(path.join(tmpDir, 'system.drawio'), '<mxfile/>');
+    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz', 'drawio']));
+    expect(files).toHaveLength(4);
   });
 });
