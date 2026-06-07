@@ -7,27 +7,27 @@ function resolveExcalidrawBin(): string {
     // Try npm global prefix bin — handles cases where the global bin isn't in PATH
     const npmPrefix = spawnSync('npm', ['config', 'get', 'prefix'], { encoding: 'utf-8' });
     if (!npmPrefix.error && npmPrefix.status === 0 && npmPrefix.stdout) {
-        const binPath = path.join(npmPrefix.stdout.trim(), 'bin', 'excalidraw-export');
+        const binPath = path.join(npmPrefix.stdout.trim(), 'bin', 'excalidraw-brute-export-cli');
         if (existsSync(binPath)) {
             return binPath;
         }
     }
-    return 'excalidraw-export';
+    return 'excalidraw-brute-export-cli';
 }
 
 export const excalidrawProvider: DiagramProvider = {
     name: 'excalidraw',
     extensions: ['.excalidraw'],
-    supportedFormats: ['png'],
-    defaultFormat: 'png',
+    supportedFormats: ['svg', 'png'],
+    defaultFormat: 'svg',
 
     check() {
         const bin = resolveExcalidrawBin();
-        const result = spawnSync(bin, [], { encoding: 'utf-8' });
+        const result = spawnSync(bin, ['--help'], { encoding: 'utf-8' });
         if (result.error) {
             return {
                 available: false,
-                message: 'excalidraw-export not found. Install via: npm install -g excalidraw-export-cli && npx playwright install chromium',
+                message: 'excalidraw-brute-export-cli not found. Install via: npm install -g excalidraw-brute-export-cli && npx playwright install firefox',
             };
         }
         return { available: true };
@@ -39,7 +39,7 @@ export const excalidrawProvider: DiagramProvider = {
         }
         const bin = resolveExcalidrawBin();
         const outputFile = path.join(outputDir, path.basename(file, path.extname(file)) + '.' + format);
-        const result = spawnSync(bin, [file, outputFile], { encoding: 'utf-8' });
+        const result = spawnSync(bin, ['-i', file, '--format', format, '-o', outputFile], { encoding: 'utf-8' });
         if (result.error || result.status !== 0) {
             throw new Error(result.stderr || result.stdout || result.error?.message || 'excalidraw render failed');
         }
