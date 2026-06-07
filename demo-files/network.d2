@@ -1,0 +1,10 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+  }
+}
+
+client -> api: request
+api -> db: query
+db -> api: result
+api -> client: response

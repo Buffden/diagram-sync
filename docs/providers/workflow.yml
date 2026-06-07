@@ -11,6 +11,7 @@ on:
       - '**/*.gv'
       - '**/*.drawio'
       - '**/*.dio'
+      - '**/*.d2'
   push:
     branches: [main]
     paths:
@@ -22,6 +23,7 @@ on:
       - '**/*.gv'
       - '**/*.drawio'
       - '**/*.dio'
+      - '**/*.d2'
   workflow_dispatch:
 
 jobs:
@@ -49,6 +51,9 @@ jobs:
           DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
           wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
           sudo apt-get install -y ./drawio.deb xvfb
+
+      - name: Install D2
+        run: curl -fsSL https://d2lang.com/install.sh | sh
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -86,6 +91,9 @@ jobs:
           DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
           wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
           sudo apt-get install -y ./drawio.deb xvfb
+
+      - name: Install D2
+        run: curl -fsSL https://d2lang.com/install.sh | sh
 
       - name: Generate diagrams
         run: npx diagram-sync

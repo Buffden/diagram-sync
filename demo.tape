@@ -24,7 +24,7 @@ Sleep 1s
 Type "npx diagram-sync"
 Sleep 500ms
 Enter
-Sleep 10s
+Sleep 12s
 
 Type "ls -1 diagrams"
 Enter
