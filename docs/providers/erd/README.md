@@ -16,15 +16,15 @@ brew install erd
 
 ### Linux (Debian/Ubuntu)
 
-Download the pre-built binary from the [erd releases page](https://github.com/BurntSushi/erd/releases):
+`erd` has no pre-built Linux binaries — install via Stack:
 
 ```bash
-ERD_VERSION=$(curl -s https://api.github.com/repos/BurntSushi/erd/releases/latest | jq -r '.tag_name')
-wget -q "https://github.com/BurntSushi/erd/releases/download/${ERD_VERSION}/erd-${ERD_VERSION}-linux.tar.gz" -O erd.tar.gz
-tar -xzf erd.tar.gz
-sudo mv erd /usr/local/bin/erd
-sudo apt-get install -y graphviz
+sudo apt-get install -y haskell-stack graphviz
+stack install erd
+echo "$HOME/.local/bin" >> $GITHUB_PATH
 ```
+
+> Note: Stack compiles `erd` from source on first run. This takes several minutes in CI. The step is marked `continue-on-error: true` in the provided `workflow.yml` so it does not block the rest of the workflow.
 
 ### Windows
 

@@ -72,11 +72,11 @@ jobs:
           npx playwright install chromium
 
       - name: Install ERD
+        continue-on-error: true
         run: |
-          ERD_VERSION=$(curl -s https://api.github.com/repos/BurntSushi/erd/releases/latest | jq -r '.tag_name')
-          wget -q "https://github.com/BurntSushi/erd/releases/download/${ERD_VERSION}/erd-${ERD_VERSION}-linux.tar.gz" -O erd.tar.gz
-          tar -xzf erd.tar.gz
-          sudo mv erd /usr/local/bin/erd
+          sudo apt-get install -y haskell-stack graphviz
+          stack install erd
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -129,11 +129,11 @@ jobs:
           npx playwright install chromium
 
       - name: Install ERD
+        continue-on-error: true
         run: |
-          ERD_VERSION=$(curl -s https://api.github.com/repos/BurntSushi/erd/releases/latest | jq -r '.tag_name')
-          wget -q "https://github.com/BurntSushi/erd/releases/download/${ERD_VERSION}/erd-${ERD_VERSION}-linux.tar.gz" -O erd.tar.gz
-          tar -xzf erd.tar.gz
-          sudo mv erd /usr/local/bin/erd
+          sudo apt-get install -y haskell-stack graphviz
+          stack install erd
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Generate diagrams
         run: npx diagram-sync
