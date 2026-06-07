@@ -2,8 +2,9 @@ import { DiagramProvider } from './types';
 import { plantumlProvider } from './plantuml';
 import { mermaidProvider } from './mermaid';
 import { graphvizProvider } from './graphviz';
+import { drawioProvider } from './drawio';
 
-const registry: DiagramProvider[] = [plantumlProvider, mermaidProvider, graphvizProvider];
+const registry: DiagramProvider[] = [plantumlProvider, mermaidProvider, graphvizProvider, drawioProvider];
 
 const extensionMap = new Map<string, DiagramProvider>();
 
