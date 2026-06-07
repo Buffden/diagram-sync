@@ -4,6 +4,17 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.4.2] — 2026-06-07
+
+### Fixed
+
+- Excalidraw provider now passes all required flags to `excalidraw-brute-export-cli`: `--scale 1 --background 0 --dark-mode 0 --embed-scene 0` — previously missing flags caused the CLI to error with "Missing required flag"
+- CI/CD workflow updated to use `npx playwright install --with-deps firefox` for Excalidraw — installs OS-level browser dependencies needed on Ubuntu runners
+- CI/CD workflow updated to patch `bpmn-to-image` with `--no-sandbox` and `--disable-setuid-sandbox` Chrome flags — prevents `SIGSYS` crash in sandboxed GitHub Actions environments
+- Removed accidental self-referencing `diagram-sync` local tarball from `dependencies`
+
+---
+
 ## [3.4.1] — 2026-06-07
 
 ### Changed

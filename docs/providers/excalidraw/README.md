@@ -6,7 +6,7 @@ Renders `.excalidraw` files using `excalidraw-brute-export-cli` with headless Fi
 
 ## Installation
 
-### macOS & Linux
+### macOS & Linux (local)
 
 ```bash
 npm install -g excalidraw-brute-export-cli
@@ -14,6 +14,15 @@ npx playwright install firefox
 ```
 
 > **Note:** `diagram-sync` resolves the binary via `npm config get prefix` so it works even if the global npm bin is not in your PATH.
+
+### CI/CD (Ubuntu / GitHub Actions)
+
+Use `--with-deps` to also install required OS-level browser dependencies:
+
+```bash
+npm install -g excalidraw-brute-export-cli
+npx playwright install --with-deps firefox
+```
 
 ### Windows
 
@@ -85,4 +94,5 @@ Requires a Personal Access Token (PAT) with `contents: write` permission saved a
 - If `excalidraw-brute-export-cli` is not found, `diagram-sync` skips Excalidraw files with a clear install hint and continues
 - `diagram-sync` resolves the binary path via `npm config get prefix` — works even when the npm global bin is not in PATH
 - Uses headless Firefox via Playwright — no display server required
+- On CI (GitHub Actions, Ubuntu), use `npx playwright install --with-deps firefox` to ensure all OS-level browser dependencies are installed
 - Excalidraw files can be created using the [Excalidraw web app](https://excalidraw.com), the VS Code extension, or by hand

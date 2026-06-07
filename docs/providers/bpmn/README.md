@@ -1,25 +1,32 @@
 # BPMN Provider
 
-Renders `.bpmn` files using `bpmn-to-image` with headless Chromium via Playwright. Output format is configurable — defaults to `png`.
+Renders `.bpmn` files using `bpmn-to-image` with headless Chromium via Puppeteer. Output format is configurable — defaults to `png`.
 
 ---
 
 ## Installation
 
-### macOS & Linux
+### macOS & Linux (local)
 
 ```bash
 npm install -g bpmn-to-image
-npx playwright install chromium
 ```
 
 > **Note:** `diagram-sync` resolves the binary via `npm config get prefix` so it works even if the global npm bin is not in your PATH.
+
+### CI/CD (Ubuntu / GitHub Actions)
+
+`bpmn-to-image` uses Puppeteer/Chromium without `--no-sandbox` by default, which causes a `SIGSYS` crash in sandboxed CI environments. Patch it after install:
+
+```bash
+npm install -g bpmn-to-image
+sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
+```
 
 ### Windows
 
 ```bash
 npm install -g bpmn-to-image
-npx playwright install chromium
 ```
 
 ---
@@ -91,6 +98,8 @@ Requires a Personal Access Token (PAT) with `contents: write` permission saved a
 
 - If `bpmn-to-image` is not found, `diagram-sync` skips BPMN files with a clear install hint and continues
 - `diagram-sync` resolves the binary path via `npm config get prefix` — works even when the npm global bin is not in PATH
-- Uses headless Chromium via Playwright — no display server required
+- Uses headless Chromium via Puppeteer — no display server required
 - Only `png` and `pdf` output are supported — this is a limitation of `bpmn-to-image`
+- On CI (GitHub Actions, Ubuntu), patch `bpmn-to-image` with `--no-sandbox` after install to prevent `SIGSYS` sandbox crashes — see the CI/CD install section above
+- BPMN source files must include a `<bpmndi:BPMNDiagram>` section with layout coordinates — bpmn-js will throw "no diagram to display" without it
 - BPMN files can be created using [Camunda Modeler](https://camunda.com/download/modeler/), the VS Code BPMN editor, or by hand
