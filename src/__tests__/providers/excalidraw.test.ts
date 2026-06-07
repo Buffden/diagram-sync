@@ -62,7 +62,7 @@ describe('excalidrawProvider.generate', () => {
     excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'svg');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'excalidraw-brute-export-cli',
-      ['-i', '/repo/diagram.excalidraw', '--format', 'svg', '-o', '/repo/diagrams/diagram.svg'],
+      ['-i', '/repo/diagram.excalidraw', '--format', 'svg', '--scale', '1', '--background', '0', '--dark-mode', '0', '--embed-scene', '0', '-o', '/repo/diagrams/diagram.svg'],
       expect.any(Object),
     );
   });
@@ -72,7 +72,7 @@ describe('excalidrawProvider.generate', () => {
     excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'png');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'excalidraw-brute-export-cli',
-      ['-i', '/repo/diagram.excalidraw', '--format', 'png', '-o', '/repo/diagrams/diagram.png'],
+      ['-i', '/repo/diagram.excalidraw', '--format', 'png', '--scale', '1', '--background', '0', '--dark-mode', '0', '--embed-scene', '0', '-o', '/repo/diagrams/diagram.png'],
       expect.any(Object),
     );
   });
@@ -82,7 +82,7 @@ describe('excalidrawProvider.generate', () => {
     excalidrawProvider.generate('/repo/system.excalidraw', '/repo/diagrams', 'svg');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'excalidraw-brute-export-cli',
-      ['-i', '/repo/system.excalidraw', '--format', 'svg', '-o', '/repo/diagrams/system.svg'],
+      ['-i', '/repo/system.excalidraw', '--format', 'svg', '--scale', '1', '--background', '0', '--dark-mode', '0', '--embed-scene', '0', '-o', '/repo/diagrams/system.svg'],
       expect.any(Object),
     );
   });

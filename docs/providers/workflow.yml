@@ -39,16 +39,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install PlantUML
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
-
-      - name: Install Graphviz
-        run: sudo apt-get install -y graphviz
 
       - name: Install draw.io
         run: |
@@ -62,13 +59,12 @@ jobs:
       - name: Install Excalidraw CLI
         run: |
           npm install -g excalidraw-brute-export-cli
-          npx playwright install firefox
+          npx playwright install --with-deps firefox
 
       - name: Install BPMN CLI
         run: |
           npm install -g bpmn-to-image
-          npx playwright install chromium
-
+          sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -90,16 +86,13 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Install PlantUML
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
-
-      - name: Install Graphviz
-        run: sudo apt-get install -y graphviz
 
       - name: Install draw.io
         run: |
@@ -113,13 +106,12 @@ jobs:
       - name: Install Excalidraw CLI
         run: |
           npm install -g excalidraw-brute-export-cli
-          npx playwright install firefox
+          npx playwright install --with-deps firefox
 
       - name: Install BPMN CLI
         run: |
           npm install -g bpmn-to-image
-          npx playwright install chromium
-
+          sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
       - name: Generate diagrams
         run: npx diagram-sync
