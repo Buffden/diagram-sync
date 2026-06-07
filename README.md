@@ -217,7 +217,7 @@ jobs:
         run: |
           DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
           wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
-          sudo apt-get install -y ./drawio.deb
+          sudo apt-get install -y ./drawio.deb xvfb
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -254,7 +254,7 @@ jobs:
         run: |
           DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
           wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
-          sudo apt-get install -y ./drawio.deb
+          sudo apt-get install -y ./drawio.deb xvfb
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -284,7 +284,7 @@ Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets.
   - **PlantUML:** Java 11+ and PlantUML — see [PlantUML guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/plantuml)
   - **Mermaid:** see [Mermaid guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/mermaid)
   - **Graphviz:** see [Graphviz guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz)
-  - **Draw.io:** see [Draw.io guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio)
+  - **Draw.io:** requires `draw.io` and `xvfb` (Linux only) — `diagram-sync` auto-uses `xvfb-run` for headless rendering when no display is available — see [Draw.io guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio)
   - **Other providers:** see [Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)
 
 Providers are detected at runtime and missing ones are skipped with a warning.
