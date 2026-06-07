@@ -4,6 +4,16 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.2.0] — 2026-06-07
+
+### Added
+
+- Draw.io provider: supports `.drawio` and `.dio` files via the `drawio` CLI
+- Draw.io output formats: `svg`, `png`, `jpg`, `jpeg`, `pdf` — defaults to `svg`
+- In CI environments (`CI=true`), Draw.io automatically uses `--no-sandbox --disable-gpu` — no manual workflow configuration needed
+
+---
+
 ## [3.1.0] — 2026-06-05
 
 ### Added

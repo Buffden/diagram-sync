@@ -1,7 +1,7 @@
 {
   "name": "diagram-sync",
-  "version": "3.1.0",
-  "description": "Automatically export diagrams from PlantUML, Mermaid, and Graphviz source files — keeps architecture documentation in sync with code across CI/CD pipelines, npm scripts, and local workflows.",
+  "version": "3.2.0",
+  "description": "Automatically export diagrams from PlantUML, Mermaid, Graphviz, and Draw.io source files — keeps architecture documentation in sync with code across CI/CD pipelines, npm scripts, and local workflows.",
   "bin": {
     "diagram-sync": "dist/index.js"
   },
@@ -30,6 +30,8 @@
     "mermaid",
     "graphviz",
     "dot",
+    "drawio",
+    "draw-io",
     "devops",
     "automation",
     "technical-documentation",
