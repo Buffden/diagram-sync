@@ -20,99 +20,110 @@ describe('excalidrawProvider metadata', () => {
     expect(excalidrawProvider.extensions).toContain('.excalidraw');
   });
 
-  it('only supports png format', () => {
-    expect(excalidrawProvider.supportedFormats).toEqual(['png']);
+  it('supports svg and png formats', () => {
+    expect(excalidrawProvider.supportedFormats).toContain('svg');
+    expect(excalidrawProvider.supportedFormats).toContain('png');
   });
 
-  it('does not support svg or pdf', () => {
-    expect(excalidrawProvider.supportedFormats).not.toContain('svg');
+  it('does not support pdf', () => {
     expect(excalidrawProvider.supportedFormats).not.toContain('pdf');
   });
 
-  it('defaults to png', () => {
-    expect(excalidrawProvider.defaultFormat).toBe('png');
+  it('defaults to svg', () => {
+    expect(excalidrawProvider.defaultFormat).toBe('svg');
   });
 });
 
 describe('excalidrawProvider.check', () => {
-  it('returns available when excalidraw-export binary is found', () => {
-    mockSpawnSync.mockReturnValue({ status: 1, error: undefined } as any);
+  it('returns available when excalidraw-brute-export-cli binary is found', () => {
+    mockSpawnSync.mockReturnValue({ status: 0, error: undefined } as any);
     expect(excalidrawProvider.check().available).toBe(true);
   });
 
-  it('returns unavailable when excalidraw-export binary is not found', () => {
+  it('returns unavailable when excalidraw-brute-export-cli binary is not found', () => {
     mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
     const result = excalidrawProvider.check();
     expect(result.available).toBe(false);
     expect(result.message).toBeDefined();
   });
 
-  it('includes install hint referencing excalidraw-export-cli and playwright', () => {
+  it('includes install hint referencing excalidraw-brute-export-cli and playwright firefox', () => {
     mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
     const result = excalidrawProvider.check();
-    expect(result.message).toMatch(/excalidraw-export-cli/i);
+    expect(result.message).toMatch(/excalidraw-brute-export-cli/i);
     expect(result.message).toMatch(/playwright/i);
+    expect(result.message).toMatch(/firefox/i);
   });
 });
 
 describe('excalidrawProvider.generate', () => {
-  it('calls excalidraw-export with input and output file', () => {
+  it('calls excalidraw-brute-export-cli with -i, --format, -o flags for svg', () => {
+    mockSpawnSync.mockReturnValue({ status: 0 } as any);
+    excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'svg');
+    expect(mockSpawnSync).toHaveBeenCalledWith(
+      'excalidraw-brute-export-cli',
+      ['-i', '/repo/diagram.excalidraw', '--format', 'svg', '-o', '/repo/diagrams/diagram.svg'],
+      expect.any(Object),
+    );
+  });
+
+  it('calls excalidraw-brute-export-cli with -i, --format, -o flags for png', () => {
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
     excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'png');
     expect(mockSpawnSync).toHaveBeenCalledWith(
-      'excalidraw-export',
-      ['/repo/diagram.excalidraw', '/repo/diagrams/diagram.png'],
+      'excalidraw-brute-export-cli',
+      ['-i', '/repo/diagram.excalidraw', '--format', 'png', '-o', '/repo/diagrams/diagram.png'],
       expect.any(Object),
     );
   });
 
   it('uses the source filename without its extension for the output filename', () => {
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
-    excalidrawProvider.generate('/repo/system.excalidraw', '/repo/diagrams', 'png');
+    excalidrawProvider.generate('/repo/system.excalidraw', '/repo/diagrams', 'svg');
     expect(mockSpawnSync).toHaveBeenCalledWith(
-      'excalidraw-export',
-      ['/repo/system.excalidraw', '/repo/diagrams/system.png'],
+      'excalidraw-brute-export-cli',
+      ['-i', '/repo/system.excalidraw', '--format', 'svg', '-o', '/repo/diagrams/system.svg'],
       expect.any(Object),
     );
   });
 
   it('throws on unsupported format', () => {
-    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'svg')).toThrow(
+    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'pdf')).toThrow(
       /does not support format/,
     );
   });
 
-  it('throws with stderr when excalidraw-export exits non-zero', () => {
+  it('throws with stderr when excalidraw-brute-export-cli exits non-zero', () => {
     mockSpawnSync.mockReturnValue({ status: 1, stderr: 'render failed', stdout: '', error: undefined } as any);
-    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'png')).toThrow('render failed');
+    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'svg')).toThrow('render failed');
   });
 
   it('falls back to stdout when stderr is empty', () => {
     mockSpawnSync.mockReturnValue({ status: 1, stderr: '', stdout: 'Failed to load Excalidraw module.', error: undefined } as any);
-    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'png')).toThrow('Failed to load Excalidraw module.');
+    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'svg')).toThrow('Failed to load Excalidraw module.');
   });
 
   it('throws with error message when spawn fails', () => {
     mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
-    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'png')).toThrow('ENOENT');
+    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'svg')).toThrow('ENOENT');
   });
 
   it('throws with fallback message when no stderr, stdout or error', () => {
     mockSpawnSync.mockReturnValue({ status: 1, stderr: '', stdout: '', error: undefined } as any);
-    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'png')).toThrow('excalidraw render failed');
+    expect(() => excalidrawProvider.generate('/repo/diagram.excalidraw', '/out', 'svg')).toThrow('excalidraw render failed');
   });
 
-  it('input file is the first argument', () => {
+  it('input file is passed after -i flag', () => {
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
-    excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'png');
+    excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'svg');
     const args = mockSpawnSync.mock.calls[1][1] as string[];
-    expect(args[0]).toBe('/repo/diagram.excalidraw');
+    expect(args[args.indexOf('-i') + 1]).toBe('/repo/diagram.excalidraw');
   });
 
-  it('output file is the last argument', () => {
+  it('output file is passed after -o flag', () => {
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
-    excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'png');
+    excalidrawProvider.generate('/repo/diagram.excalidraw', '/repo/diagrams', 'svg');
     const args = mockSpawnSync.mock.calls[1][1] as string[];
-    expect(args[args.length - 1]).toBe('/repo/diagrams/diagram.png');
+    expect(args[args.indexOf('-o') + 1]).toBe('/repo/diagrams/diagram.svg');
   });
 });

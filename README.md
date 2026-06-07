@@ -54,7 +54,7 @@ docs/architecture/system.puml        →  diagrams/docs/architecture/system.svg
 docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
 src/infra/pipeline.dot               →  diagrams/src/infra/pipeline.svg
 src/infra/network.d2                 →  diagrams/src/infra/network.svg
-docs/architecture/sketch.excalidraw  →  diagrams/docs/architecture/sketch.png
+docs/architecture/sketch.excalidraw  →  diagrams/docs/architecture/sketch.svg
 docs/processes/checkout.bpmn         →  diagrams/docs/processes/checkout.png
 ```
 
@@ -232,8 +232,8 @@ jobs:
 
       - name: Install Excalidraw CLI
         run: |
-          npm install -g excalidraw-export-cli
-          npx playwright install chromium
+          npm install -g excalidraw-brute-export-cli
+          npx playwright install firefox
 
       - name: Install BPMN CLI
         run: |
@@ -283,8 +283,8 @@ jobs:
 
       - name: Install Excalidraw CLI
         run: |
-          npm install -g excalidraw-export-cli
-          npx playwright install chromium
+          npm install -g excalidraw-brute-export-cli
+          npx playwright install firefox
 
       - name: Install BPMN CLI
         run: |
@@ -322,7 +322,7 @@ Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets.
   - **Graphviz:** see [Graphviz guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz)
   - **Draw.io:** requires `draw.io` and `xvfb` (Linux only) — `diagram-sync` auto-uses `xvfb-run` for headless rendering when no display is available — see [Draw.io guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio)
   - **D2:** see [D2 guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2)
-  - **Excalidraw:** requires `excalidraw-export-cli` and Playwright Chromium — PNG only — see [Excalidraw guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw)
+  - **Excalidraw:** requires `excalidraw-brute-export-cli` and Playwright Firefox — SVG and PNG — see [Excalidraw guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw)
   - **BPMN:** requires `bpmn-to-image` and Playwright Chromium — PNG and PDF only — see [BPMN guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/bpmn)
 
 Providers are detected at runtime and missing ones are skipped with a warning.
@@ -336,7 +336,7 @@ Providers are detected at runtime and missing ones are skipped with a warning.
 - **How to automate Graphviz diagram generation in CI/CD**
 - **How to convert Draw.io files to images automatically in CI/CD**
 - **How to automate D2 diagram generation in CI/CD**
-- **How to export Excalidraw files to PNG automatically in CI/CD**
+- **How to export Excalidraw files to SVG or PNG automatically in CI/CD**
 - **How to automate BPMN process diagram generation in CI/CD**
 - **How to keep README architecture diagrams up to date automatically**
 - **How to sync architecture diagrams from source files**

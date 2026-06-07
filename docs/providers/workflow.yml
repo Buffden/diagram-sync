@@ -61,8 +61,8 @@ jobs:
 
       - name: Install Excalidraw CLI
         run: |
-          npm install -g excalidraw-export-cli
-          npx playwright install chromium
+          npm install -g excalidraw-brute-export-cli
+          npx playwright install firefox
 
       - name: Install BPMN CLI
         run: |
@@ -112,8 +112,8 @@ jobs:
 
       - name: Install Excalidraw CLI
         run: |
-          npm install -g excalidraw-export-cli
-          npx playwright install chromium
+          npm install -g excalidraw-brute-export-cli
+          npx playwright install firefox
 
       - name: Install BPMN CLI
         run: |

@@ -4,6 +4,16 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.4.1] — 2026-06-07
+
+### Changed
+
+- Excalidraw provider now uses `excalidraw-brute-export-cli` instead of `excalidraw-export-cli`
+- Excalidraw now supports SVG output in addition to PNG — defaults to SVG (consistent with all other providers)
+- Excalidraw uses headless Firefox via Playwright instead of Chromium
+
+---
+
 ## [3.4.0] — 2026-06-07
 
 ### Added

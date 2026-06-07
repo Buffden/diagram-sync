@@ -1,6 +1,6 @@
 # Excalidraw Provider
 
-Renders `.excalidraw` files using `excalidraw-export-cli` with headless Chromium via Playwright. Output format is PNG only.
+Renders `.excalidraw` files using `excalidraw-brute-export-cli` with headless Firefox via Playwright. Supports SVG and PNG output — defaults to SVG.
 
 ---
 
@@ -9,8 +9,8 @@ Renders `.excalidraw` files using `excalidraw-export-cli` with headless Chromium
 ### macOS & Linux
 
 ```bash
-npm install -g excalidraw-export-cli
-npx playwright install chromium
+npm install -g excalidraw-brute-export-cli
+npx playwright install firefox
 ```
 
 > **Note:** `diagram-sync` resolves the binary via `npm config get prefix` so it works even if the global npm bin is not in your PATH.
@@ -18,8 +18,8 @@ npx playwright install chromium
 ### Windows
 
 ```bash
-npm install -g excalidraw-export-cli
-npx playwright install chromium
+npm install -g excalidraw-brute-export-cli
+npx playwright install firefox
 ```
 
 ---
@@ -34,9 +34,10 @@ npx playwright install chromium
 
 ## Supported Output Formats
 
-PNG only — this is a limitation of `excalidraw-export-cli`.
-
-`png`
+| Format | Default |
+| --- | --- |
+| `svg` | Yes |
+| `png` | — |
 
 ---
 
@@ -45,8 +46,8 @@ PNG only — this is a limitation of `excalidraw-export-cli`.
 Images generated under `diagrams/`, mirroring the source path.
 
 ```text
-docs/architecture/system.excalidraw  →  diagrams/docs/architecture/system.png
-src/flows/auth.excalidraw            →  diagrams/src/flows/auth.png
+docs/architecture/system.excalidraw  →  diagrams/docs/architecture/system.svg
+src/flows/auth.excalidraw            →  diagrams/src/flows/auth.svg
 ```
 
 ---
@@ -55,7 +56,7 @@ src/flows/auth.excalidraw            →  diagrams/src/flows/auth.png
 
 Excalidraw files are discovered and rendered automatically. No config required.
 
-To set format per job (PNG is the only supported format):
+To set format per job:
 
 ```json
 {
@@ -81,8 +82,7 @@ Requires a Personal Access Token (PAT) with `contents: write` permission saved a
 
 ## Notes
 
-- If `excalidraw-export` is not found, `diagram-sync` skips Excalidraw files with a clear install hint and continues
+- If `excalidraw-brute-export-cli` is not found, `diagram-sync` skips Excalidraw files with a clear install hint and continues
 - `diagram-sync` resolves the binary path via `npm config get prefix` — works even when the npm global bin is not in PATH
-- Uses headless Chromium via Playwright — no display server required
-- Only PNG output is supported — this is a limitation of `excalidraw-export-cli`, not `diagram-sync`
+- Uses headless Firefox via Playwright — no display server required
 - Excalidraw files can be created using the [Excalidraw web app](https://excalidraw.com), the VS Code extension, or by hand
