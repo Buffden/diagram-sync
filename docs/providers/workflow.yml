@@ -12,6 +12,7 @@ on:
       - '**/*.drawio'
       - '**/*.dio'
       - '**/*.d2'
+      - '**/*.excalidraw'
   push:
     branches: [main]
     paths:
@@ -24,6 +25,7 @@ on:
       - '**/*.drawio'
       - '**/*.dio'
       - '**/*.d2'
+      - '**/*.excalidraw'
   workflow_dispatch:
 
 jobs:
@@ -54,6 +56,11 @@ jobs:
 
       - name: Install D2
         run: curl -fsSL https://d2lang.com/install.sh | sh
+
+      - name: Install Excalidraw CLI
+        run: |
+          npm install -g excalidraw-export-cli
+          npx playwright install chromium
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -94,6 +101,11 @@ jobs:
 
       - name: Install D2
         run: curl -fsSL https://d2lang.com/install.sh | sh
+
+      - name: Install Excalidraw CLI
+        run: |
+          npm install -g excalidraw-export-cli
+          npx playwright install chromium
 
       - name: Generate diagrams
         run: npx diagram-sync

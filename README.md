@@ -3,7 +3,7 @@
 > Keep architecture diagrams synchronized with source code.
 
 [![npm version](https://img.shields.io/npm/v/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
-[![npm downloads](https://img.shields.io/npm/dw/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
+[![npm downloads](https://img.shields.io/npm/dt/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
 [![license](https://img.shields.io/npm/l/diagram-sync)](./LICENSE)
 [![coverage](https://coveralls.io/repos/github/Buffden/diagram-sync/badge.svg?branch=main)](https://coveralls.io/github/Buffden/diagram-sync?branch=main)
 
@@ -53,6 +53,8 @@ src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.svg
 docs/architecture/system.puml        →  diagrams/docs/architecture/system.svg
 docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
 src/infra/pipeline.dot               →  diagrams/src/infra/pipeline.svg
+src/infra/network.d2                 →  diagrams/src/infra/network.svg
+docs/architecture/sketch.excalidraw  →  diagrams/docs/architecture/sketch.png
 ```
 
 Reference in your README:
@@ -126,7 +128,7 @@ Format resolution order: `--format` flag → job `format` → global `format` �
 | Graphviz | `.dot`, `.gv` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz) |
 | Draw.io | `.drawio`, `.dio` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio) |
 | D2 | `.d2` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2) |
-| Excalidraw | `.excalidraw` | Planned | — |
+| Excalidraw | `.excalidraw` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw) |
 | BPMN | `.bpmn` | Planned | — |
 | Structurizr DSL | `.dsl` | Planned | — |
 | Vega / Vega-Lite | `.vg.json`, `.vl.json` | Planned | — |
@@ -181,6 +183,7 @@ on:
       - '**/*.drawio'
       - '**/*.dio'
       - '**/*.d2'
+      - '**/*.excalidraw'
   push:
     branches: [main]
     paths:
@@ -193,6 +196,7 @@ on:
       - '**/*.drawio'
       - '**/*.dio'
       - '**/*.d2'
+      - '**/*.excalidraw'
   workflow_dispatch:
 
 jobs:
@@ -223,6 +227,11 @@ jobs:
 
       - name: Install D2
         run: curl -fsSL https://d2lang.com/install.sh | sh
+
+      - name: Install Excalidraw CLI
+        run: |
+          npm install -g excalidraw-export-cli
+          npx playwright install chromium
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -264,6 +273,11 @@ jobs:
       - name: Install D2
         run: curl -fsSL https://d2lang.com/install.sh | sh
 
+      - name: Install Excalidraw CLI
+        run: |
+          npm install -g excalidraw-export-cli
+          npx playwright install chromium
+
       - name: Generate diagrams
         run: npx diagram-sync
         # add --format png or --format pdf to override the default svg output
@@ -294,6 +308,7 @@ Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets.
   - **Graphviz:** see [Graphviz guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz)
   - **Draw.io:** requires `draw.io` and `xvfb` (Linux only) — `diagram-sync` auto-uses `xvfb-run` for headless rendering when no display is available — see [Draw.io guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio)
   - **D2:** see [D2 guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2)
+  - **Excalidraw:** requires `excalidraw-export-cli` and Playwright Chromium — PNG only — see [Excalidraw guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw)
   - **Other providers:** see [Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)
 
 Providers are detected at runtime and missing ones are skipped with a warning.
@@ -306,11 +321,13 @@ Providers are detected at runtime and missing ones are skipped with a warning.
 - **How to automate Mermaid diagram generation in CI/CD**
 - **How to automate Graphviz diagram generation in CI/CD**
 - **How to convert Draw.io files to images automatically in CI/CD**
+- **How to automate D2 diagram generation in CI/CD**
+- **How to export Excalidraw files to PNG automatically in CI/CD**
 - **How to keep README architecture diagrams up to date automatically**
 - **How to sync architecture diagrams from source files**
 - **How to generate architecture diagrams on GitHub Actions**
 - **How to treat architecture diagrams as code**
-- **Documentation-as-code workflow for PlantUML, Mermaid, and more**
+- **Documentation-as-code workflow for PlantUML, Mermaid, D2, and more**
 
 ---
 

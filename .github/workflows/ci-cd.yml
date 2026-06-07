@@ -44,6 +44,11 @@ jobs:
       - name: Install D2
         run: curl -fsSL https://d2lang.com/install.sh | sh
 
+      - name: Install Excalidraw CLI
+        run: |
+          npm install -g excalidraw-export-cli
+          npx playwright install chromium
+
       - name: Build
         run: npm run build
 

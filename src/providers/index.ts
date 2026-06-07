@@ -4,8 +4,9 @@ import { mermaidProvider } from './mermaid';
 import { graphvizProvider } from './graphviz';
 import { drawioProvider } from './drawio';
 import { d2Provider } from './d2';
+import { excalidrawProvider } from './excalidraw';
 
-const registry: DiagramProvider[] = [plantumlProvider, mermaidProvider, graphvizProvider, drawioProvider, d2Provider];
+const registry: DiagramProvider[] = [plantumlProvider, mermaidProvider, graphvizProvider, drawioProvider, d2Provider, excalidrawProvider];
 
 const extensionMap = new Map<string, DiagramProvider>();
 

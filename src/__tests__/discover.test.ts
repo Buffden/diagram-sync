@@ -76,6 +76,20 @@ describe('discoverFiles', () => {
     expect(files[0]).toMatch(/flow\.dio$/);
   });
 
+  it('finds .d2 files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'system.d2'), 'x -> y');
+    const files = discoverFiles(tmpDir, makeConfig(['d2']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/system\.d2$/);
+  });
+
+  it('finds .excalidraw files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'sketch.excalidraw'), '{}');
+    const files = discoverFiles(tmpDir, makeConfig(['excalidraw']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/sketch\.excalidraw$/);
+  });
+
   it('finds files in subdirectories', () => {
     const subDir = path.join(tmpDir, 'src', 'flows');
     fs.mkdirSync(subDir, { recursive: true });
@@ -127,7 +141,9 @@ describe('discoverFiles', () => {
     fs.writeFileSync(path.join(tmpDir, 'chart.mmd'), 'graph TD');
     fs.writeFileSync(path.join(tmpDir, 'arch.dot'), 'digraph {}');
     fs.writeFileSync(path.join(tmpDir, 'system.drawio'), '<mxfile/>');
-    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz', 'drawio']));
-    expect(files).toHaveLength(4);
+    fs.writeFileSync(path.join(tmpDir, 'pipeline.d2'), 'x -> y');
+    fs.writeFileSync(path.join(tmpDir, 'sketch.excalidraw'), '{}');
+    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz', 'drawio', 'd2', 'excalidraw']));
+    expect(files).toHaveLength(6);
   });
 });
