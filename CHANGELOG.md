@@ -4,6 +4,15 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.4.3] — 2026-06-07
+
+### Added
+
+- BPMN provider now supports SVG output in addition to PNG and PDF — defaults to SVG (consistent with all other providers)
+- `demo-files/checkout.bpmn` updated to include `<bpmndi:BPMNDiagram>` layout section — required for bpmn-to-image to render
+
+---
+
 ## [3.4.2] — 2026-06-07
 
 ### Fixed

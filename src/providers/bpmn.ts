@@ -17,8 +17,8 @@ function resolveBpmnBin(): string {
 export const bpmnProvider: DiagramProvider = {
     name: 'bpmn',
     extensions: ['.bpmn'],
-    supportedFormats: ['png', 'pdf'],
-    defaultFormat: 'png',
+    supportedFormats: ['svg', 'png', 'pdf'],
+    defaultFormat: 'svg',
 
     check() {
         const bin = resolveBpmnBin();
