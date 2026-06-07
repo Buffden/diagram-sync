@@ -52,6 +52,7 @@ npm install --save-dev diagram-sync
 src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.svg
 docs/architecture/system.puml        →  diagrams/docs/architecture/system.svg
 docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
+src/infra/pipeline.dot               →  diagrams/src/infra/pipeline.svg
 ```
 
 Reference in your README:
@@ -278,8 +279,6 @@ Providers are detected at runtime and missing ones are skipped with a warning.
 - **How to automate PlantUML diagram generation in CI/CD**
 - **How to automate Mermaid diagram generation in CI/CD**
 - **How to automate Graphviz diagram generation in CI/CD**
-- **How to convert Draw.io files to images automatically**
-- **How to export Excalidraw diagrams in CI/CD**
 - **How to keep README architecture diagrams up to date automatically**
 - **How to sync architecture diagrams from source files**
 - **How to generate architecture diagrams on GitHub Actions**

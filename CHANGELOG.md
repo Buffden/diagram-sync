@@ -78,4 +78,4 @@ All notable changes to this project will be documented here.
 - Ignores `node_modules`, `.git`, `dist`, `build`, `diagrams`
 - Optional `diagram-sync.config.json` with job-based configuration
 - `--config` CLI flag
-- npm publishing ready: MIT license, Node 18+
+- npm publishing ready: MIT license, Node 20+
