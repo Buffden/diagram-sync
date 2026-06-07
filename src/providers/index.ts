@@ -6,9 +6,8 @@ import { drawioProvider } from './drawio';
 import { d2Provider } from './d2';
 import { excalidrawProvider } from './excalidraw';
 import { bpmnProvider } from './bpmn';
-import { erdProvider } from './erd';
 
-const registry: DiagramProvider[] = [plantumlProvider, mermaidProvider, graphvizProvider, drawioProvider, d2Provider, excalidrawProvider, bpmnProvider, erdProvider];
+const registry: DiagramProvider[] = [plantumlProvider, mermaidProvider, graphvizProvider, drawioProvider, d2Provider, excalidrawProvider, bpmnProvider];
 
 const extensionMap = new Map<string, DiagramProvider>();
 

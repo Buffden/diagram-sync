@@ -54,13 +54,6 @@ jobs:
           npm install -g bpmn-to-image
           npx playwright install chromium
 
-      - name: Install ERD
-        continue-on-error: true
-        run: |
-          sudo apt-get install -y haskell-stack graphviz
-          stack install erd
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
       - name: Build
         run: npm run build
 
