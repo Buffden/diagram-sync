@@ -4,6 +4,17 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.3.0] — 2026-06-07
+
+### Added
+
+- D2 provider: supports `.d2` files via the `d2` CLI — formats: `svg`, `png` — defaults to `svg`
+- Excalidraw provider: supports `.excalidraw` files via `excalidraw-export-cli` with headless Chromium — PNG only
+- Excalidraw binary resolution via `npm config get prefix` — works even when the npm global bin is not in `PATH`
+- Provider docs for [D2](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2) and [Excalidraw](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw)
+
+---
+
 ## [3.2.1] — 2026-06-07
 
 ### Fixed
