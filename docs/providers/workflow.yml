@@ -13,6 +13,7 @@ on:
       - '**/*.dio'
       - '**/*.d2'
       - '**/*.excalidraw'
+      - '**/*.bpmn'
   push:
     branches: [main]
     paths:
@@ -26,6 +27,7 @@ on:
       - '**/*.dio'
       - '**/*.d2'
       - '**/*.excalidraw'
+      - '**/*.bpmn'
   workflow_dispatch:
 
 jobs:
@@ -61,6 +63,12 @@ jobs:
         run: |
           npm install -g excalidraw-export-cli
           npx playwright install chromium
+
+      - name: Install BPMN CLI
+        run: |
+          npm install -g bpmn-to-image
+          npx playwright install chromium
+
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -106,6 +114,12 @@ jobs:
         run: |
           npm install -g excalidraw-export-cli
           npx playwright install chromium
+
+      - name: Install BPMN CLI
+        run: |
+          npm install -g bpmn-to-image
+          npx playwright install chromium
+
 
       - name: Generate diagrams
         run: npx diagram-sync

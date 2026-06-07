@@ -49,6 +49,11 @@ jobs:
           npm install -g excalidraw-export-cli
           npx playwright install chromium
 
+      - name: Install BPMN CLI
+        run: |
+          npm install -g bpmn-to-image
+          npx playwright install chromium
+
       - name: Build
         run: npm run build
 
