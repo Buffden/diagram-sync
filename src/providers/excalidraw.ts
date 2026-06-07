@@ -39,7 +39,7 @@ export const excalidrawProvider: DiagramProvider = {
         }
         const bin = resolveExcalidrawBin();
         const outputFile = path.join(outputDir, path.basename(file, path.extname(file)) + '.' + format);
-        const result = spawnSync(bin, ['-i', file, '--format', format, '--scale', '1', '-o', outputFile], { encoding: 'utf-8' });
+        const result = spawnSync(bin, ['-i', file, '--format', format, '--scale', '1', '--background', '0', '--dark-mode', '0', '--embed-scene', '0', '-o', outputFile], { encoding: 'utf-8' });
         if (result.error || result.status !== 0) {
             throw new Error(result.stderr || result.stdout || result.error?.message || 'excalidraw render failed');
         }
