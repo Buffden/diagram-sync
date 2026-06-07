@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="http://bpmn.io/schema/bpmn">
+  <process id="Process_1" isExecutable="false">
+    <startEvent id="StartEvent_1" name="Order Placed"/>
+    <sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_1"/>
+    <userTask id="Task_1" name="Process Payment"/>
+    <sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Task_2"/>
+    <serviceTask id="Task_2" name="Ship Order"/>
+    <sequenceFlow id="Flow_3" sourceRef="Task_2" targetRef="EndEvent_1"/>
+    <endEvent id="EndEvent_1" name="Order Complete"/>
+  </process>
+</definitions>

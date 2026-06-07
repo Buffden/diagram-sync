@@ -1,0 +1,20 @@
+[User]
+*id
+name
+email
+
+[Post]
+*id
+title
+body
+user_id
+
+[Comment]
+*id
+body
+user_id
+post_id
+
+User 1--* Post
+User 1--* Comment
+Post 1--* Comment
