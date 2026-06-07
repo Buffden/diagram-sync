@@ -90,6 +90,20 @@ describe('discoverFiles', () => {
     expect(files[0]).toMatch(/sketch\.excalidraw$/);
   });
 
+  it('finds .bpmn files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'process.bpmn'), '<definitions/>');
+    const files = discoverFiles(tmpDir, makeConfig(['bpmn']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/process\.bpmn$/);
+  });
+
+  it('finds .er files', () => {
+    fs.writeFileSync(path.join(tmpDir, 'schema.er'), '[User]');
+    const files = discoverFiles(tmpDir, makeConfig(['erd']));
+    expect(files).toHaveLength(1);
+    expect(files[0]).toMatch(/schema\.er$/);
+  });
+
   it('finds files in subdirectories', () => {
     const subDir = path.join(tmpDir, 'src', 'flows');
     fs.mkdirSync(subDir, { recursive: true });
@@ -143,7 +157,9 @@ describe('discoverFiles', () => {
     fs.writeFileSync(path.join(tmpDir, 'system.drawio'), '<mxfile/>');
     fs.writeFileSync(path.join(tmpDir, 'pipeline.d2'), 'x -> y');
     fs.writeFileSync(path.join(tmpDir, 'sketch.excalidraw'), '{}');
-    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz', 'drawio', 'd2', 'excalidraw']));
-    expect(files).toHaveLength(6);
+    fs.writeFileSync(path.join(tmpDir, 'process.bpmn'), '<definitions/>');
+    fs.writeFileSync(path.join(tmpDir, 'schema.er'), '[User]');
+    const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz', 'drawio', 'd2', 'excalidraw', 'bpmn', 'erd']));
+    expect(files).toHaveLength(8);
   });
 });
