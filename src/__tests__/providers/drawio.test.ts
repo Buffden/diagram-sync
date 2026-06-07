@@ -10,10 +10,13 @@ const mockSpawnSync = vi.mocked(spawnSync);
 beforeEach(() => {
   mockSpawnSync.mockReset();
   delete process.env.CI;
+  process.env.DISPLAY = ':0';
 });
 
 afterEach(() => {
   delete process.env.CI;
+  delete process.env.DISPLAY;
+  vi.restoreAllMocks();
 });
 
 describe('drawioProvider metadata', () => {
@@ -65,6 +68,33 @@ describe('drawioProvider.check', () => {
     mockSpawnSync.mockReturnValue({ status: 1, error: undefined } as any);
     expect(drawioProvider.check().available).toBe(true);
   });
+
+  it('returns unavailable on Linux with no display when xvfb-run is not found', () => {
+    delete process.env.DISPLAY;
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+    mockSpawnSync
+      .mockReturnValueOnce({ status: 0, error: undefined } as any)  // drawio --version
+      .mockReturnValueOnce({ status: 1, error: undefined } as any); // which xvfb-run
+    const result = drawioProvider.check();
+    expect(result.available).toBe(false);
+    expect(result.message).toMatch(/xvfb/i);
+  });
+
+  it('returns available on Linux with no display when xvfb-run is found', () => {
+    delete process.env.DISPLAY;
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+    mockSpawnSync
+      .mockReturnValueOnce({ status: 0, error: undefined } as any)  // drawio --version
+      .mockReturnValueOnce({ status: 0, error: undefined } as any); // which xvfb-run
+    expect(drawioProvider.check().available).toBe(true);
+  });
+
+  it('skips xvfb-run check on Linux when display is available', () => {
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+    mockSpawnSync.mockReturnValue({ status: 0, error: undefined } as any);
+    expect(drawioProvider.check().available).toBe(true);
+    expect(mockSpawnSync).toHaveBeenCalledTimes(1); // only drawio --version
+  });
 });
 
 describe('drawioProvider.generate', () => {
@@ -73,7 +103,7 @@ describe('drawioProvider.generate', () => {
     drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'svg');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'drawio',
-      ['--export', '--format', 'svg', '--output', '/repo/diagrams/arch.svg', '/repo/arch.drawio'],
+      ['--no-sandbox', '--disable-gpu', '--export', '--format', 'svg', '--output', '/repo/diagrams/arch.svg', '/repo/arch.drawio'],
       expect.any(Object),
     );
   });
@@ -83,7 +113,7 @@ describe('drawioProvider.generate', () => {
     drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'png');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'drawio',
-      ['--export', '--format', 'png', '--output', '/repo/diagrams/arch.png', '/repo/arch.drawio'],
+      ['--no-sandbox', '--disable-gpu', '--export', '--format', 'png', '--output', '/repo/diagrams/arch.png', '/repo/arch.drawio'],
       expect.any(Object),
     );
   });
@@ -93,7 +123,7 @@ describe('drawioProvider.generate', () => {
     drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'jpg');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'drawio',
-      ['--export', '--format', 'jpg', '--output', '/repo/diagrams/arch.jpg', '/repo/arch.drawio'],
+      ['--no-sandbox', '--disable-gpu', '--export', '--format', 'jpg', '--output', '/repo/diagrams/arch.jpg', '/repo/arch.drawio'],
       expect.any(Object),
     );
   });
@@ -103,7 +133,7 @@ describe('drawioProvider.generate', () => {
     drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'pdf');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'drawio',
-      ['--export', '--format', 'pdf', '--output', '/repo/diagrams/arch.pdf', '/repo/arch.drawio'],
+      ['--no-sandbox', '--disable-gpu', '--export', '--format', 'pdf', '--output', '/repo/diagrams/arch.pdf', '/repo/arch.drawio'],
       expect.any(Object),
     );
   });
@@ -113,7 +143,7 @@ describe('drawioProvider.generate', () => {
     drawioProvider.generate('/repo/system.dio', '/repo/diagrams', 'svg');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'drawio',
-      ['--export', '--format', 'svg', '--output', '/repo/diagrams/system.svg', '/repo/system.dio'],
+      ['--no-sandbox', '--disable-gpu', '--export', '--format', 'svg', '--output', '/repo/diagrams/system.svg', '/repo/system.dio'],
       expect.any(Object),
     );
   });
@@ -139,22 +169,13 @@ describe('drawioProvider.generate', () => {
     expect(() => drawioProvider.generate('/repo/arch.drawio', '/out', 'svg')).toThrow('drawio render failed');
   });
 
-  it('puts --no-sandbox and --disable-gpu before --export in CI', () => {
-    process.env.CI = 'true';
+  it('always puts --no-sandbox and --disable-gpu before --export', () => {
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
     drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'svg');
     const args = mockSpawnSync.mock.calls[0][1] as string[];
     expect(args[0]).toBe('--no-sandbox');
     expect(args[1]).toBe('--disable-gpu');
     expect(args.indexOf('--export')).toBeGreaterThan(args.indexOf('--disable-gpu'));
-  });
-
-  it('does not include --no-sandbox or --disable-gpu outside CI', () => {
-    mockSpawnSync.mockReturnValue({ status: 0 } as any);
-    drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'svg');
-    const args = mockSpawnSync.mock.calls[0][1] as string[];
-    expect(args).not.toContain('--no-sandbox');
-    expect(args).not.toContain('--disable-gpu');
   });
 
   it('input file is always the last argument', () => {
@@ -164,8 +185,29 @@ describe('drawioProvider.generate', () => {
     expect(args[args.length - 1]).toBe('/repo/arch.drawio');
   });
 
-  it('input file is last argument in CI mode too', () => {
-    process.env.CI = 'true';
+  it('uses xvfb-run on Linux when no display is available', () => {
+    delete process.env.DISPLAY;
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+    mockSpawnSync.mockReturnValue({ status: 0 } as any);
+    drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'svg');
+    expect(mockSpawnSync).toHaveBeenCalledWith(
+      'xvfb-run',
+      ['-a', 'drawio', '--no-sandbox', '--disable-gpu', '--export', '--format', 'svg', '--output', '/repo/diagrams/arch.svg', '/repo/arch.drawio'],
+      expect.any(Object),
+    );
+  });
+
+  it('uses drawio directly when display is available on Linux', () => {
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+    mockSpawnSync.mockReturnValue({ status: 0 } as any);
+    drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'svg');
+    const cmd = mockSpawnSync.mock.calls[0][0] as string;
+    expect(cmd).toBe('drawio');
+  });
+
+  it('input file is last argument when using xvfb-run', () => {
+    delete process.env.DISPLAY;
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
     drawioProvider.generate('/repo/arch.drawio', '/repo/diagrams', 'svg');
     const args = mockSpawnSync.mock.calls[0][1] as string[];
