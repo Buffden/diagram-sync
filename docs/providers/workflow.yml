@@ -9,6 +9,8 @@ on:
       - '**/*.mermaid'
       - '**/*.dot'
       - '**/*.gv'
+      - '**/*.drawio'
+      - '**/*.dio'
   push:
     branches: [main]
     paths:
@@ -18,6 +20,8 @@ on:
       - '**/*.mermaid'
       - '**/*.dot'
       - '**/*.gv'
+      - '**/*.drawio'
+      - '**/*.dio'
   workflow_dispatch:
 
 jobs:
@@ -39,6 +43,12 @@ jobs:
 
       - name: Install Graphviz
         run: sudo apt-get install -y graphviz
+
+      - name: Install draw.io
+        run: |
+          DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
+          wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
+          sudo apt-get install -y ./drawio.deb
 
       - name: Generate diagrams
         run: npx diagram-sync
@@ -70,6 +80,12 @@ jobs:
 
       - name: Install Graphviz
         run: sudo apt-get install -y graphviz
+
+      - name: Install draw.io
+        run: |
+          DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
+          wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
+          sudo apt-get install -y ./drawio.deb
 
       - name: Generate diagrams
         run: npx diagram-sync
