@@ -20,16 +20,16 @@ describe('bpmnProvider metadata', () => {
     expect(bpmnProvider.extensions).toContain('.bpmn');
   });
 
-  it('supports png and pdf formats', () => {
-    expect(bpmnProvider.supportedFormats).toEqual(expect.arrayContaining(['png', 'pdf']));
+  it('supports svg, png and pdf formats', () => {
+    expect(bpmnProvider.supportedFormats).toEqual(expect.arrayContaining(['svg', 'png', 'pdf']));
   });
 
-  it('does not support svg', () => {
-    expect(bpmnProvider.supportedFormats).not.toContain('svg');
+  it('does not support other formats', () => {
+    expect(bpmnProvider.supportedFormats).not.toContain('jpg');
   });
 
-  it('defaults to png', () => {
-    expect(bpmnProvider.defaultFormat).toBe('png');
+  it('defaults to svg', () => {
+    expect(bpmnProvider.defaultFormat).toBe('svg');
   });
 });
 
@@ -55,6 +55,16 @@ describe('bpmnProvider.check', () => {
 });
 
 describe('bpmnProvider.generate', () => {
+  it('calls bpmn-to-image with file:output argument for svg', () => {
+    mockSpawnSync.mockReturnValue({ status: 0 } as any);
+    bpmnProvider.generate('/repo/process.bpmn', '/repo/diagrams', 'svg');
+    expect(mockSpawnSync).toHaveBeenCalledWith(
+      'bpmn-to-image',
+      ['/repo/process.bpmn:/repo/diagrams/process.svg'],
+      expect.any(Object),
+    );
+  });
+
   it('calls bpmn-to-image with file:output argument for png', () => {
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
     bpmnProvider.generate('/repo/process.bpmn', '/repo/diagrams', 'png');
@@ -77,16 +87,16 @@ describe('bpmnProvider.generate', () => {
 
   it('uses the source filename without its extension for the output filename', () => {
     mockSpawnSync.mockReturnValue({ status: 0 } as any);
-    bpmnProvider.generate('/repo/order-flow.bpmn', '/repo/diagrams', 'png');
+    bpmnProvider.generate('/repo/order-flow.bpmn', '/repo/diagrams', 'svg');
     expect(mockSpawnSync).toHaveBeenCalledWith(
       'bpmn-to-image',
-      ['/repo/order-flow.bpmn:/repo/diagrams/order-flow.png'],
+      ['/repo/order-flow.bpmn:/repo/diagrams/order-flow.svg'],
       expect.any(Object),
     );
   });
 
   it('throws on unsupported format', () => {
-    expect(() => bpmnProvider.generate('/repo/process.bpmn', '/out', 'svg')).toThrow(
+    expect(() => bpmnProvider.generate('/repo/process.bpmn', '/out', 'jpg')).toThrow(
       /does not support format/,
     );
   });
