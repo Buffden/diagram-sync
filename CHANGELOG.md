@@ -4,6 +4,17 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.4.0] — 2026-06-07
+
+### Added
+
+- BPMN provider: supports `.bpmn` files via `bpmn-to-image` with headless Chromium — `png` and `pdf` only — defaults to `png`
+- ERD provider: supports `.er` files via the `erd` CLI — formats: `svg`, `png`, `pdf` — defaults to `svg` — requires Graphviz
+- BPMN binary resolution via `npm config get prefix` — works even when the npm global bin is not in `PATH`
+- Provider docs for [BPMN](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/bpmn) and [ERD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/erd)
+
+---
+
 ## [3.3.0] — 2026-06-07
 
 ### Added

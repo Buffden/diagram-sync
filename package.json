@@ -1,7 +1,7 @@
 {
   "name": "diagram-sync",
-  "version": "3.3.0",
-  "description": "Automatically export diagrams from PlantUML, Mermaid, Graphviz, Draw.io, D2, and Excalidraw source files — keeps architecture documentation in sync with code across CI/CD pipelines, npm scripts, and local workflows.",
+  "version": "3.4.0",
+  "description": "Automatically export diagrams from PlantUML, Mermaid, Graphviz, Draw.io, D2, Excalidraw, BPMN, and ERD source files — keeps architecture documentation in sync with code across CI/CD pipelines, npm scripts, and local workflows.",
   "bin": {
     "diagram-sync": "dist/index.js"
   },
@@ -42,7 +42,11 @@
     "readme-diagrams",
     "d2",
     "excalidraw",
-    "excalidraw-export"
+    "excalidraw-export",
+    "bpmn",
+    "bpmn-to-image",
+    "erd",
+    "entity-relationship"
   ],
   "files": [
     "dist/",
