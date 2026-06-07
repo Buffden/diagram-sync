@@ -4,13 +4,22 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.2.1] — 2026-06-07
+
+### Fixed
+
+- Draw.io headless rendering on Linux — `diagram-sync` now automatically uses `xvfb-run` when no `$DISPLAY` is available (e.g. GitHub Actions), eliminating the `Missing X server or $DISPLAY` crash
+- If `xvfb-run` is not installed, `diagram-sync` skips Draw.io files with a clear install hint instead of crashing with Electron errors
+- `--no-sandbox` and `--disable-gpu` are now always passed to `drawio`, not just in CI environments
+
+---
+
 ## [3.2.0] — 2026-06-07
 
 ### Added
 
 - Draw.io provider: supports `.drawio` and `.dio` files via the `drawio` CLI
 - Draw.io output formats: `svg`, `png`, `jpg`, `jpeg`, `pdf` — defaults to `svg`
-- In CI environments (`CI=true`), Draw.io automatically uses `--no-sandbox --disable-gpu` — no manual workflow configuration needed
 
 ---
 
