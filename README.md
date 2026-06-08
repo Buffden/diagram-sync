@@ -166,38 +166,56 @@ npm run diagrams
 
 ### 3. CI/CD
 
-Generates a preview on every PR and commits images to `main` on merge:
+Generates a preview on every PR and commits images to `main` on merge.
+
+**Remove the install steps and path filters for providers you don't use** — most teams only need 1–2.
 
 ```yaml
 name: Generate and Commit Diagrams
 
+# Remove path entries for providers you don't use.
+# The workflow only triggers when a matching source file changes.
 on:
   pull_request:
     paths:
+      # PlantUML — remove if not using .puml / .plantuml files
       - '**/*.puml'
       - '**/*.plantuml'
+      # Mermaid — remove if not using .mmd / .mermaid files
       - '**/*.mmd'
       - '**/*.mermaid'
+      # Graphviz — remove if not using .dot / .gv files
       - '**/*.dot'
       - '**/*.gv'
+      # Draw.io — remove if not using .drawio / .dio files
       - '**/*.drawio'
       - '**/*.dio'
+      # D2 — remove if not using .d2 files
       - '**/*.d2'
+      # Excalidraw — remove if not using .excalidraw files
       - '**/*.excalidraw'
+      # BPMN — remove if not using .bpmn files
       - '**/*.bpmn'
   push:
     branches: [main]
     paths:
+      # PlantUML — remove if not using .puml / .plantuml files
       - '**/*.puml'
       - '**/*.plantuml'
+      # Mermaid — remove if not using .mmd / .mermaid files
       - '**/*.mmd'
       - '**/*.mermaid'
+      # Graphviz — remove if not using .dot / .gv files
       - '**/*.dot'
       - '**/*.gv'
+      # Draw.io — remove if not using .drawio / .dio files
       - '**/*.drawio'
       - '**/*.dio'
+      # D2 — remove if not using .d2 files
       - '**/*.d2'
+      # Excalidraw — remove if not using .excalidraw files
       - '**/*.excalidraw'
+      # BPMN — remove if not using .bpmn files
       - '**/*.bpmn'
   workflow_dispatch:
 
@@ -210,26 +228,43 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
+      # --- PlantUML — remove if not using .puml / .plantuml files ---
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+
+      # --- Mermaid — remove if not using .mmd / .mermaid files ---
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
 
-      - name: Install draw.io
+      # --- Graphviz — remove if not using .dot / .gv files ---
+      - name: Install Graphviz
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y graphviz
+
+      # --- Draw.io — remove if not using .drawio / .dio files ---
+      - name: Install Draw.io
         run: |
           DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
           wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
           sudo apt-get install -y ./drawio.deb xvfb
 
+      # --- D2 — remove if not using .d2 files ---
       - name: Install D2
         run: curl -fsSL https://d2lang.com/install.sh | sh
 
+      # --- Excalidraw — remove if not using .excalidraw files ---
       - name: Install Excalidraw CLI
         run: npm install -g @swiftlysingh/excalidraw-cli
 
+      # --- BPMN — remove if not using .bpmn files ---
       - name: Install BPMN CLI
         run: |
           npm install -g bpmn-to-image
@@ -255,26 +290,43 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
+      # --- PlantUML — remove if not using .puml / .plantuml files ---
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+
+      # --- Mermaid — remove if not using .mmd / .mermaid files ---
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
 
-      - name: Install draw.io
+      # --- Graphviz — remove if not using .dot / .gv files ---
+      - name: Install Graphviz
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y graphviz
+
+      # --- Draw.io — remove if not using .drawio / .dio files ---
+      - name: Install Draw.io
         run: |
           DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
           wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
           sudo apt-get install -y ./drawio.deb xvfb
 
+      # --- D2 — remove if not using .d2 files ---
       - name: Install D2
         run: curl -fsSL https://d2lang.com/install.sh | sh
 
+      # --- Excalidraw — remove if not using .excalidraw files ---
       - name: Install Excalidraw CLI
         run: npm install -g @swiftlysingh/excalidraw-cli
 
+      # --- BPMN — remove if not using .bpmn files ---
       - name: Install BPMN CLI
         run: |
           npm install -g bpmn-to-image
