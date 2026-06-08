@@ -19,13 +19,16 @@ Sleep 300ms
 
 Type "ls -1"
 Enter
-Sleep 1s
+Sleep 2s
 
-Type "npx diagram-sync"
+Type "npx diagram-sync@latest"
 Sleep 500ms
 Enter
-Sleep 12s
+Sleep 3s
+Type "y"
+Enter
+Sleep 17s
 
 Type "ls -1 diagrams"
 Enter
-Sleep 2s
+Sleep 4s
