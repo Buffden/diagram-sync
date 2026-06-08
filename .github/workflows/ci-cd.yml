@@ -45,9 +45,7 @@ jobs:
         run: curl -fsSL https://d2lang.com/install.sh | sh
 
       - name: Install Excalidraw CLI
-        run: |
-          npm install -g excalidraw-brute-export-cli
-          npx playwright install firefox
+        run: npm install -g @swiftlysingh/excalidraw-cli
 
       - name: Install BPMN CLI
         run: |

@@ -7,12 +7,12 @@ function resolveExcalidrawBin(): string {
     // Try npm global prefix bin — handles cases where the global bin isn't in PATH
     const npmPrefix = spawnSync('npm', ['config', 'get', 'prefix'], { encoding: 'utf-8' });
     if (!npmPrefix.error && npmPrefix.status === 0 && npmPrefix.stdout) {
-        const binPath = path.join(npmPrefix.stdout.trim(), 'bin', 'excalidraw-brute-export-cli');
+        const binPath = path.join(npmPrefix.stdout.trim(), 'bin', 'excalidraw-cli');
         if (existsSync(binPath)) {
             return binPath;
         }
     }
-    return 'excalidraw-brute-export-cli';
+    return 'excalidraw-cli';
 }
 
 export const excalidrawProvider: DiagramProvider = {
@@ -27,7 +27,7 @@ export const excalidrawProvider: DiagramProvider = {
         if (result.error) {
             return {
                 available: false,
-                message: 'excalidraw-brute-export-cli not found. Install via: npm install -g excalidraw-brute-export-cli && npx playwright install firefox',
+                message: 'excalidraw-cli not found. Install via: npm install -g @swiftlysingh/excalidraw-cli',
             };
         }
         return { available: true };
@@ -39,7 +39,7 @@ export const excalidrawProvider: DiagramProvider = {
         }
         const bin = resolveExcalidrawBin();
         const outputFile = path.join(outputDir, path.basename(file, path.extname(file)) + '.' + format);
-        const result = spawnSync(bin, ['-i', file, '--format', format, '--scale', '1', '--background', '0', '--dark-mode', '0', '--embed-scene', '0', '-o', outputFile], { encoding: 'utf-8' });
+        const result = spawnSync(bin, ['convert', file, '--format', format, '-o', outputFile], { encoding: 'utf-8' });
         if (result.error || result.status !== 0) {
             throw new Error(result.stderr || result.stdout || result.error?.message || 'excalidraw render failed');
         }
