@@ -228,9 +228,7 @@ jobs:
         run: curl -fsSL https://d2lang.com/install.sh | sh
 
       - name: Install Excalidraw CLI
-        run: |
-          npm install -g excalidraw-brute-export-cli
-          npx playwright install --with-deps firefox
+        run: npm install -g @swiftlysingh/excalidraw-cli
 
       - name: Install BPMN CLI
         run: |
@@ -275,9 +273,7 @@ jobs:
         run: curl -fsSL https://d2lang.com/install.sh | sh
 
       - name: Install Excalidraw CLI
-        run: |
-          npm install -g excalidraw-brute-export-cli
-          npx playwright install --with-deps firefox
+        run: npm install -g @swiftlysingh/excalidraw-cli
 
       - name: Install BPMN CLI
         run: |
@@ -314,7 +310,7 @@ Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets.
   - **Graphviz:** see [Graphviz guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz)
   - **Draw.io:** requires `draw.io` and `xvfb` (Linux only) — `diagram-sync` auto-uses `xvfb-run` for headless rendering when no display is available — see [Draw.io guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio)
   - **D2:** see [D2 guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2)
-  - **Excalidraw:** requires `excalidraw-brute-export-cli` and Playwright Firefox — SVG and PNG — see [Excalidraw guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw)
+  - **Excalidraw:** requires `@swiftlysingh/excalidraw-cli` — SVG and PNG, no browser required — see [Excalidraw guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw)
   - **BPMN:** requires `bpmn-to-image` — PNG and PDF only — on CI, patch with `--no-sandbox` after install (see [BPMN guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/bpmn))
 
 Providers are detected at runtime and missing ones are skipped with a warning.

@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.4.4] — 2026-06-07
+
+### Changed
+
+- Excalidraw provider switched from `excalidraw-brute-export-cli` to `@swiftlysingh/excalidraw-cli` — no browser or Playwright required, works on macOS, Linux, and Windows
+
+---
+
 ## [3.4.3] — 2026-06-07
 
 ### Added
