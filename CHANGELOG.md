@@ -4,6 +4,15 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.4.5] — 2026-06-07
+
+### Changed
+
+- CI/CD workflow restructured by provider — each install step is now individually labeled with a remove-if-not-using comment, making it easy to copy-paste only the providers your project uses
+- README CI/CD section updated to match
+
+---
+
 ## [3.4.4] — 2026-06-07
 
 ### Changed
