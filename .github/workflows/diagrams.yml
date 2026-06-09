@@ -58,6 +58,8 @@ jobs:
           # PAT_TOKEN is required for push (to commit back to the repo).
           # On PRs, GITHUB_TOKEN is sufficient and safer — avoids exposing PAT to fork builds.
           token: ${{ github.event_name == 'pull_request' && secrets.GITHUB_TOKEN || secrets.PAT_TOKEN }}
+          # Full history required so git diff can resolve base refs for --files filtering.
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v5

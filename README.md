@@ -217,6 +217,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          # Full history required so git diff can resolve base refs for --files filtering.
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v5
@@ -288,6 +291,8 @@ jobs:
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT_TOKEN }}
+          # Full history required so git diff can resolve base refs for --files filtering.
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v5
