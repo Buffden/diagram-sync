@@ -136,7 +136,11 @@ Config is optional — no config file needed to get started. Add `diagram-sync.c
     {
       "name": "architecture",
       "type": "plantuml",
-      "format": "pdf"
+      "format": "png"
+    },
+    {
+      "name": "flows",
+      "type": "mermaid"
     }
   ]
 }
