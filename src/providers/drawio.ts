@@ -10,7 +10,7 @@ export const drawioProvider: DiagramProvider = {
 
 	check() {
 		const result = spawnSync('drawio', ['--version'], { encoding: 'utf-8' });
-		if (result.error) {
+		if (result.error || result.status !== 0) {
 			return {
 				available: false,
 				message: 'drawio not found. Install it from https://www.drawio.com or via: brew install --cask drawio',

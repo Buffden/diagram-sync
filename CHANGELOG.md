@@ -4,6 +4,21 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.5.2] — 2026-06-09
+
+### Fixed
+
+- `graphviz.ts`, `drawio.ts`: `check()` only tested `result.error` (spawn failure) but not `result.status !== 0` — a non-zero exit from `dot -V` or `drawio --version` (e.g. corrupt install, permission error) would incorrectly report the provider as available and silently fail later during generation
+
+### Docs
+
+- README restructured: Configuration merged into Usage Options as section 5, all usage sections now include demo GIFs, Quick Start updated with tree-style path table
+- `diagram-sync.config.json` example added to repo
+- `--files` and `--changed` flags documented as explicit usage sections
+- `diagrams` npm script added to `package.json`
+
+---
+
 ## [3.5.1] — 2026-06-09
 
 ### Fixed
