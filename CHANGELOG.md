@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.5.1] — 2026-06-09
+
+### Fixed
+
+- Published dist was built from stale source — `--files` and `--changed` flags were missing from the npm package
+
+---
+
 ## [3.5.0] — 2026-06-09
 
 ### Fixed
