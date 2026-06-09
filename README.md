@@ -13,7 +13,7 @@
 npx diagram-sync
 ```
 
-![demo](https://raw.githubusercontent.com/Buffden/diagram-sync/main/demo.gif)
+![demo](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo.gif)
 
 ---
 
@@ -154,7 +154,27 @@ npx diagram-sync
 npm run diagrams
 ```
 
-### 3. CI/CD
+### 3. Regenerate specific files only
+
+Pass explicit paths — skips discovery entirely. Used by CI to regenerate only the files changed in a push or PR.
+
+```bash
+npx diagram-sync --files src/auth.puml docs/flow.mmd
+```
+
+![demo-files](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-files.gif)
+
+### 4. Regenerate only locally changed files
+
+Processes only files modified since the last commit (`git diff HEAD` + untracked). Useful locally to avoid regenerating every diagram in a large repo.
+
+```bash
+npx diagram-sync --changed
+```
+
+![demo-changed](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-changed.gif)
+
+### 5. CI/CD
 
 Generates a preview on every PR and commits images to `main` on merge.
 

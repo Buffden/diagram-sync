@@ -1,4 +1,6 @@
-Output demo.gif
+# Demo: --changed flag — detects diagram files modified since the last commit
+# (git diff HEAD + untracked) and regenerates only those files.
+Output docs/demo-changed.gif
 
 Set FontSize 24
 Set Width 1400
@@ -13,22 +15,11 @@ Set WindowBarSize 40
 Set MarginFill "#1e1e2e"
 Set Margin 20
 
-Type "cd demo-files"
-Enter
-Sleep 300ms
-
-Type "ls -1"
-Enter
-Sleep 2s
-
-Type "npx diagram-sync@latest"
+Type "npx diagram-sync --changed"
 Sleep 500ms
 Enter
-Sleep 3s
-Type "y"
-Enter
-Sleep 17s
+Sleep 10s
 
-Type "ls -1 diagrams"
+Type "tree diagrams"
 Enter
 Sleep 4s
