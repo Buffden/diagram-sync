@@ -29,7 +29,7 @@ export function discoverChangedFiles(root: string, config: Config): string[] {
 	);
 
 	const tracked = spawnSync('git', ['diff', 'HEAD', '--name-only'], { encoding: 'utf-8', cwd: root });
-	if (tracked.error) {
+	if (tracked.error || tracked.status !== 0) {
 		return [];
 	}
 

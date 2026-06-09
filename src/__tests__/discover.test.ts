@@ -233,6 +233,12 @@ describe('discoverChangedFiles', () => {
 		expect(files).toHaveLength(0);
 	});
 
+	it('returns empty array when git exits with non-zero status (not a git repo)', () => {
+		mockSpawnSync.mockReturnValueOnce({ stdout: '', stderr: 'fatal: not a git repository', status: 128 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(0);
+	});
+
 	it('combines modified and untracked files', () => {
 		mockSpawnSync
 			.mockReturnValueOnce({ stdout: 'existing.puml\n', stderr: '', status: 0 } as any)
