@@ -32,26 +32,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Graphviz
-        run: sudo apt-get install -y graphviz
-
-      - name: Install draw.io
-        run: |
-          DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
-          wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
-          sudo apt-get install -y ./drawio.deb xvfb
-
-      - name: Install D2
-        run: curl -fsSL https://d2lang.com/install.sh | sh
-
-      - name: Install Excalidraw CLI
-        run: npm install -g @swiftlysingh/excalidraw-cli
-
-      - name: Install BPMN CLI
-        run: |
-          npm install -g bpmn-to-image
-          npx playwright install chromium
-
       - name: Build
         run: npm run build
 

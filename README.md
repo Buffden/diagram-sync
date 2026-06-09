@@ -270,8 +270,11 @@ jobs:
           npm install -g bpmn-to-image
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
+      - name: Install diagram-sync
+        run: npm install -g diagram-sync
+
       - name: Generate diagrams
-        run: npx diagram-sync
+        run: diagram-sync
         # add --format png or --format pdf to override the default svg output
 
       - name: Upload diagram previews
@@ -332,8 +335,11 @@ jobs:
           npm install -g bpmn-to-image
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
+      - name: Install diagram-sync
+        run: npm install -g diagram-sync
+
       - name: Generate diagrams
-        run: npx diagram-sync
+        run: diagram-sync
         # add --format png or --format pdf to override the default svg output
 
       - name: Commit generated diagrams
