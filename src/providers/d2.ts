@@ -5,7 +5,7 @@ import path from 'path';
 export const d2Provider: DiagramProvider = {
     name: 'd2',
     extensions: ['.d2'],
-    supportedFormats: ['svg', 'png'],
+    supportedFormats: ['svg', 'png', 'pdf'],
     defaultFormat: 'svg',
 
     check() {

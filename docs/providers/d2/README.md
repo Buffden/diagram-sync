@@ -36,7 +36,7 @@ Download from [d2lang.com](https://d2lang.com/tour/install) and ensure `d2` is o
 
 All formats are fully supported. Default is `svg`.
 
-`svg` `png`
+`svg` `png` `pdf`
 
 ---
 
