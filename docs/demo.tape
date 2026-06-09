@@ -1,3 +1,5 @@
+# Demo: full repo scan — runs npx diagram-sync with no flags,
+# discovers all diagram source files and generates images for all of them.
 Output docs/demo.gif
 
 Set FontSize 24

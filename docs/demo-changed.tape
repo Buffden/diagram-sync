@@ -1,6 +1,6 @@
-# Demo: --files flag — pass specific diagram file paths explicitly,
-# skips full repo discovery and regenerates only the listed files.
-Output docs/demo-files.gif
+# Demo: --changed flag — detects diagram files modified since the last commit
+# (git diff HEAD + untracked) and regenerates only those files.
+Output docs/demo-changed.gif
 
 Set FontSize 24
 Set Width 1400
@@ -15,7 +15,7 @@ Set WindowBarSize 40
 Set MarginFill "#1e1e2e"
 Set Margin 20
 
-Type "npx diagram-sync --files docs/providers/d2/network.d2 docs/providers/plantuml/system.puml"
+Type "npx diagram-sync --changed"
 Sleep 500ms
 Enter
 Sleep 10s
