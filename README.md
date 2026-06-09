@@ -263,9 +263,15 @@ jobs:
       - name: Install diagram-sync
         run: npm install -g diagram-sync
 
-      - name: Generate diagrams
-        run: diagram-sync
-        # add --format png or --format pdf to override the default svg output
+      - name: Generate changed diagrams
+        run: |
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$')
+          if [ -n "$CHANGED" ]; then
+            diagram-sync --files $CHANGED
+          else
+            echo "No diagram files changed."
+          fi
+        # add --format png or --format pdf after --files $CHANGED to override the default svg output
 
       - name: Upload diagram previews
         uses: actions/upload-artifact@v4
@@ -328,9 +334,19 @@ jobs:
       - name: Install diagram-sync
         run: npm install -g diagram-sync
 
-      - name: Generate diagrams
-        run: diagram-sync
-        # add --format png or --format pdf to override the default svg output
+      - name: Generate changed diagrams
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            diagram-sync
+          else
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$')
+            if [ -n "$CHANGED" ]; then
+              diagram-sync --files $CHANGED
+            else
+              echo "No diagram files changed."
+            fi
+          fi
+        # add --format png or --format pdf after --files $CHANGED to override the default svg output
 
       - name: Commit generated diagrams
         run: |

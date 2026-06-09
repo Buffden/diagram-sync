@@ -1,9 +1,15 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { discoverFiles } from '../discover';
+import { spawnSync } from 'child_process';
+
+vi.mock('child_process');
+
+import { discoverFiles, discoverChangedFiles } from '../discover';
 import { type Config } from '../config';
+
+const mockSpawnSync = vi.mocked(spawnSync);
 
 function makeConfig(types: string[]): Config {
 	return { jobs: types.map((t) => ({ name: t, type: t })) };
@@ -14,6 +20,7 @@ describe('discoverFiles', () => {
 
 	beforeEach(() => {
 		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'diagram-sync-discover-'));
+		mockSpawnSync.mockReset();
 	});
 
 	afterEach(() => {
@@ -153,5 +160,92 @@ describe('discoverFiles', () => {
 		fs.writeFileSync(path.join(tmpDir, 'process.bpmn'), '<definitions/>');
 		const files = discoverFiles(tmpDir, makeConfig(['plantuml', 'mermaid', 'graphviz', 'drawio', 'd2', 'excalidraw', 'bpmn']));
 		expect(files).toHaveLength(7);
+	});
+});
+
+describe('discoverChangedFiles', () => {
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'diagram-sync-changed-'));
+		mockSpawnSync.mockReset();
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true });
+	});
+
+	it('returns diagram files reported as modified by git', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: 'flow.puml\n', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: '', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(1);
+		expect(files[0]).toBe(path.resolve(tmpDir, 'flow.puml'));
+	});
+
+	it('includes new untracked diagram files', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: '', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: 'new.mmd\n', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['mermaid']));
+		expect(files).toHaveLength(1);
+		expect(files[0]).toBe(path.resolve(tmpDir, 'new.mmd'));
+	});
+
+	it('filters out non-diagram files', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: 'src/index.ts\nREADME.md\nflow.puml\n', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: '', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(1);
+		expect(files[0]).toMatch(/flow\.puml$/);
+	});
+
+	it('filters out diagram files for inactive providers', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: 'flow.puml\nchart.mmd\n', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: '', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(1);
+		expect(files.every((f) => f.endsWith('.puml'))).toBe(true);
+	});
+
+	it('resolves files to absolute paths', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: 'docs/system.puml\n', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: '', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files[0]).toBe(path.resolve(tmpDir, 'docs/system.puml'));
+	});
+
+	it('returns empty array when no diagram files changed', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: 'README.md\nsrc/index.ts\n', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: '', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(0);
+	});
+
+	it('returns empty array when git is not available', () => {
+		mockSpawnSync.mockReturnValue({ error: new Error('git not found') } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(0);
+	});
+
+	it('combines modified and untracked files', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: 'existing.puml\n', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: 'new.puml\n', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(2);
+	});
+
+	it('ignores blank lines in git output', () => {
+		mockSpawnSync
+			.mockReturnValueOnce({ stdout: '\nflow.puml\n\n', stderr: '', status: 0 } as any)
+			.mockReturnValueOnce({ stdout: '\n', stderr: '', status: 0 } as any);
+		const files = discoverChangedFiles(tmpDir, makeConfig(['plantuml']));
+		expect(files).toHaveLength(1);
 	});
 });
