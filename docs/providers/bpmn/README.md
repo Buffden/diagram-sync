@@ -1,6 +1,6 @@
 # BPMN Provider
 
-Renders `.bpmn` files using `bpmn-to-image` with headless Chromium via Puppeteer. Output format is configurable — defaults to `png`.
+Renders `.bpmn` files using `bpmn-to-image` with headless Chromium via Puppeteer. Output format is configurable — defaults to `svg`.
 
 ---
 
@@ -41,9 +41,9 @@ npm install -g bpmn-to-image
 
 ## Supported Output Formats
 
-`png` `pdf`
+All formats are fully supported. Default is `svg`.
 
-Default is `png`. SVG is not supported by `bpmn-to-image`.
+`svg` `png` `pdf`
 
 ---
 
@@ -52,15 +52,23 @@ Default is `png`. SVG is not supported by `bpmn-to-image`.
 Images generated under `diagrams/`, mirroring the source path.
 
 ```text
-src/payments/checkout.bpmn     →  diagrams/src/payments/checkout.png
-docs/processes/onboarding.bpmn →  diagrams/docs/processes/onboarding.png
+src/payments/checkout.bpmn     →  diagrams/src/payments/checkout.svg
+docs/processes/onboarding.bpmn →  diagrams/docs/processes/onboarding.svg
 ```
 
 ---
 
 ## Config
 
-No config required. BPMN files are discovered and rendered automatically in `png`.
+No config required. BPMN files are discovered and rendered automatically in `svg`.
+
+To set a global output format:
+
+```json
+{
+  "format": "png"
+}
+```
 
 To set format per job:
 
@@ -82,7 +90,7 @@ To override at runtime:
 npx diagram-sync --format pdf
 ```
 
-Format resolution order: `--format` flag → job `format` → global `format` → default `png`.
+Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
 
 ---
 
@@ -99,7 +107,6 @@ Requires a Personal Access Token (PAT) with `contents: write` permission saved a
 - If `bpmn-to-image` is not found, `diagram-sync` skips BPMN files with a clear install hint and continues
 - `diagram-sync` resolves the binary path via `npm config get prefix` — works even when the npm global bin is not in PATH
 - Uses headless Chromium via Puppeteer — no display server required
-- Only `png` and `pdf` output are supported — this is a limitation of `bpmn-to-image`
 - On CI (GitHub Actions, Ubuntu), patch `bpmn-to-image` with `--no-sandbox` after install to prevent `SIGSYS` sandbox crashes — see the CI/CD install section above
 - BPMN source files must include a `<bpmndi:BPMNDiagram>` section with layout coordinates — bpmn-js will throw "no diagram to display" without it
 - BPMN files can be created using [Camunda Modeler](https://camunda.com/download/modeler/), the VS Code BPMN editor, or by hand

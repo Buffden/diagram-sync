@@ -1,6 +1,6 @@
 # Excalidraw Provider
 
-Renders `.excalidraw` files using `@swiftlysingh/excalidraw-cli`. Supports SVG and PNG output — defaults to SVG. Works on macOS, Linux, and Windows with no browser or Playwright required.
+Renders `.excalidraw` files using `@swiftlysingh/excalidraw-cli`. Output format is configurable — defaults to `svg`. Works on macOS, Linux, and Windows with no browser or Playwright required.
 
 ---
 
@@ -26,10 +26,9 @@ npm install -g @swiftlysingh/excalidraw-cli
 
 ## Supported Output Formats
 
-| Format | Default |
-| --- | --- |
-| `svg` | Yes |
-| `png` | — |
+All formats are fully supported. Default is `svg`.
+
+`svg` `png`
 
 ---
 
@@ -46,7 +45,15 @@ src/flows/auth.excalidraw            →  diagrams/src/flows/auth.svg
 
 ## Config
 
-Excalidraw files are discovered and rendered automatically. No config required.
+No config required. Excalidraw files are discovered and rendered automatically in `svg`.
+
+To set a global output format:
+
+```json
+{
+  "format": "png"
+}
+```
 
 To set format per job:
 
@@ -62,11 +69,19 @@ To set format per job:
 }
 ```
 
+To override at runtime:
+
+```bash
+npx diagram-sync --format png
+```
+
+Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
+
 ---
 
 ## CI/CD
 
-Copy [`workflow.yml`](../workflow.yml) into `.github/workflows/` in your repo. It generates images on every push and commits them back automatically.
+Copy [`workflow.yml`](../../workflow.yml) into `.github/workflows/` in your repo. It generates images on every push and commits them back automatically.
 
 Requires a Personal Access Token (PAT) with `contents: write` permission saved as a repository secret named `PAT_TOKEN`. [How to create a PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 

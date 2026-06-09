@@ -31,7 +31,7 @@ export const bpmnProvider: DiagramProvider = {
 		if (result.error) {
 			return {
 				available: false,
-				message: 'bpmn-to-image not found. Install via: npm install -g bpmn-to-image && npx playwright install chromium',
+				message: 'bpmn-to-image not found. Install via: npm install -g bpmn-to-image',
 			};
 		}
 		return { available: true };
