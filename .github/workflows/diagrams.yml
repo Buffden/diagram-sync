@@ -77,7 +77,7 @@ jobs:
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
       - name: Generate diagrams
-        run: npx diagram-sync
+        run: npx --yes diagram-sync
 
       - name: Upload diagram previews
         if: github.event_name == 'pull_request'
