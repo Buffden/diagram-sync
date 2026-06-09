@@ -46,11 +46,11 @@ describe('bpmnProvider.check', () => {
 		expect(result.message).toBeDefined();
 	});
 
-	it('includes install hint referencing bpmn-to-image and playwright', () => {
+	it('includes install hint referencing bpmn-to-image', () => {
 		mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
 		const result = bpmnProvider.check();
 		expect(result.message).toMatch(/bpmn-to-image/i);
-		expect(result.message).toMatch(/playwright/i);
+		expect(result.message).toMatch(/npm install/i);
 	});
 });
 

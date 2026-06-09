@@ -4,6 +4,34 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.5.0] — 2026-06-09
+
+### Fixed
+
+- `generate.ts`: provider availability Sets were module-level, causing state bleed across multiple `generateDiagrams()` calls in the same process — moved inside the function
+- `excalidraw.ts`, `bpmn.ts`: binary path was re-resolved via `npm config get prefix` on every `generate()` call — now cached after first resolution
+- Passing an explicit `--config` path that does not exist now throws an error instead of silently falling back to default config
+- `bpmn.ts` check() install hint incorrectly referenced `npx playwright install chromium` — removed (`bpmn-to-image` uses Puppeteer, not Playwright)
+- D2 test suite updated to cover `pdf` format (already supported in code, tests were not updated)
+- Excalidraw and BPMN test assertions updated to reflect binary caching (single spawn call instead of two)
+
+### Added
+
+- ESLint flat config (`eslint.config.mjs`) with TypeScript rules: tab indentation, `eqeqeq`, `no-var`, `prefer-const`, `no-duplicate-imports`, `consistent-type-imports`, `no-explicit-any` (warn), `no-non-null-assertion` (warn)
+- `lint` and `lint:fix` npm scripts
+
+### Changed
+
+- Tab indentation enforced across all source and test files
+
+### Docs
+
+- BPMN provider docs corrected: SVG was incorrectly documented as unsupported (code had `supportedFormats: ['svg', 'png', 'pdf']` and `defaultFormat: 'svg'` already)
+- All 7 provider docs standardised: consistent section structure, format listings, Config examples, and format resolution order lines
+- Fixed broken relative link to `workflow.yml` in Excalidraw provider docs
+
+---
+
 ## [3.4.5] — 2026-06-07
 
 ### Changed
