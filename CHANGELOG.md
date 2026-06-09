@@ -4,6 +4,15 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.5.1] — 2026-06-09
+
+### Fixed
+
+- `discover.ts`: `discoverChangedFiles` only checked `tracked.error` (spawn failure) but not `tracked.status !== 0` — git exits with status 128 when run outside a git repo or in a repo with no commits, which previously caused an unhandled crash instead of returning an empty array
+- Republish with correct dist — `3.5.0` was published from stale build output, missing `--files` and `--changed` flags
+
+---
+
 ## [3.5.0] — 2026-06-09
 
 ### Fixed
