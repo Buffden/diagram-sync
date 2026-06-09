@@ -10,7 +10,7 @@ export const graphvizProvider: DiagramProvider = {
 
 	check() {
 		const result = spawnSync('dot', ['-V'], { encoding: 'utf-8' });
-		if (result.error) {
+		if (result.error || result.status !== 0) {
 			return {
 				available: false,
 				message: 'graphviz not found. Install it via: brew install graphviz or apt install graphviz',

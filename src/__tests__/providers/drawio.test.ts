@@ -64,9 +64,9 @@ describe('drawioProvider.check', () => {
 		expect(result.message).toMatch(/drawio/i);
 	});
 
-	it('returns available even when exit status is non-zero', () => {
+	it('returns unavailable when exit status is non-zero', () => {
 		mockSpawnSync.mockReturnValue({ status: 1, error: undefined } as any);
-		expect(drawioProvider.check().available).toBe(true);
+		expect(drawioProvider.check().available).toBe(false);
 	});
 
 	it('returns unavailable on Linux with no display when xvfb-run is not found', () => {
