@@ -1,0 +1,100 @@
+name: Generate Diagrams
+
+on:
+  pull_request:
+    paths:
+      - '**/*.puml'
+      - '**/*.plantuml'
+      - '**/*.mmd'
+      - '**/*.mermaid'
+      - '**/*.dot'
+      - '**/*.gv'
+      - '**/*.drawio'
+      - '**/*.dio'
+      - '**/*.d2'
+      - '**/*.excalidraw'
+      - '**/*.bpmn'
+  push:
+    branches: [main]
+    paths:
+      - '**/*.puml'
+      - '**/*.plantuml'
+      - '**/*.mmd'
+      - '**/*.mermaid'
+      - '**/*.dot'
+      - '**/*.gv'
+      - '**/*.drawio'
+      - '**/*.dio'
+      - '**/*.d2'
+      - '**/*.excalidraw'
+      - '**/*.bpmn'
+  workflow_dispatch:
+
+jobs:
+  diagrams:
+    name: Generate Diagrams
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          # PAT_TOKEN is required for push (to commit back to the repo).
+          # On PRs, GITHUB_TOKEN is sufficient and safer — avoids exposing PAT to fork builds.
+          token: ${{ github.event_name == 'pull_request' && secrets.GITHUB_TOKEN || secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
+
+      - name: Install Draw.io
+        run: |
+          DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
+          wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
+          sudo apt-get install -y ./drawio.deb xvfb
+
+      - name: Install D2
+        run: curl -fsSL https://d2lang.com/install.sh | sh
+
+      - name: Install Excalidraw CLI
+        run: npm install -g @swiftlysingh/excalidraw-cli
+
+      - name: Install BPMN CLI
+        run: |
+          npm install -g bpmn-to-image
+          sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
+
+      - name: Generate diagrams
+        run: npx diagram-sync
+
+      - name: Upload diagram previews
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagrams-preview
+          path: diagrams/
+
+      - name: Commit generated diagrams
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add diagrams/
+          if git diff --staged --quiet; then
+            echo "No diagram changes to commit."
+          else
+            git commit -m "chore: auto-export diagrams [skip ci]"
+            git push
+          fi
