@@ -76,8 +76,11 @@ jobs:
           npm install -g bpmn-to-image
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
+      - name: Install diagram-sync
+        run: npm install -g diagram-sync
+
       - name: Generate diagrams
-        run: npx --yes diagram-sync
+        run: diagram-sync
 
       - name: Upload diagram previews
         if: github.event_name == 'pull_request'
