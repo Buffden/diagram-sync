@@ -13,7 +13,7 @@
 npx diagram-sync
 ```
 
-![demo](https://raw.githubusercontent.com/Buffden/diagram-sync/main/demo.gif)
+![demo](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo.gif)
 
 ---
 
