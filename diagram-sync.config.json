@@ -1,0 +1,14 @@
+{
+  "format": "svg",
+  "jobs": [
+    {
+      "name": "architecture",
+      "type": "plantuml",
+      "format": "png"
+    },
+    {
+      "name": "flows",
+      "type": "mermaid"
+    }
+  ]
+}

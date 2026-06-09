@@ -154,6 +154,8 @@ npx diagram-sync --format svg
 
 Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
 
+![demo-config](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-config.gif)
+
 #### Job Options
 
 | Field | Type | Description |
