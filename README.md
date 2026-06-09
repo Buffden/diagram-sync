@@ -48,21 +48,11 @@ npm install --save-dev diagram-sync
 2. Run `npx diagram-sync` from the project root
 3. Find the generated image in `diagrams/` mirroring the source path
 
-```text
-src/services/payment/flow.puml       →  diagrams/src/services/payment/flow.svg
-docs/architecture/system.puml        →  diagrams/docs/architecture/system.svg
-docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
-src/infra/pipeline.dot               →  diagrams/src/infra/pipeline.svg
-src/infra/network.d2                 →  diagrams/src/infra/network.svg
-docs/architecture/sketch.excalidraw  →  diagrams/docs/architecture/sketch.svg
-docs/processes/checkout.bpmn         →  diagrams/docs/processes/checkout.svg
-```
+| Source | Generated |
+| --- | --- |
+| <pre>docs/<br>└── providers/<br>    ├── plantuml/<br>    │   └── system.puml<br>    └── mermaid/<br>        └── auth.mmd</pre> | <pre>diagrams/<br>└── docs/<br>    └── providers/<br>        ├── plantuml/<br>        │   └── system.svg<br>        └── mermaid/<br>            └── auth.svg</pre> |
 
-Reference in your README:
-
-```markdown
-![System Architecture](diagrams/docs/architecture/system.svg)
-```
+Once committed, the generated images are plain files in your repository — embed them in READMEs, wikis, internal docs, or link to them from anywhere on the internet via their raw GitHub URL.
 
 ---
 
@@ -72,49 +62,6 @@ Reference in your README:
 - Skips `node_modules`, `.git`, `dist`, `build`, `diagrams`
 - Derives the output path from the source file location — no input/output directories to configure
 - Generates images using the installed diagram tool for each provider — defaults to SVG, configurable via `--format` flag or config file
-
----
-
-## Configuration
-
-Config is optional. By default `diagram-sync` discovers all supported source files and generates images.
-
-Optionally add `diagram-sync.config.json` to your project root:
-
-```json
-{
-  "format": "svg",
-  "jobs": [
-    {
-      "name": "architecture",
-      "type": "plantuml",
-      "format": "pdf"
-    }
-  ]
-}
-```
-
-Load the config file:
-
-```bash
-npx diagram-sync --config diagram-sync.config.json
-```
-
-Override format at runtime:
-
-```bash
-npx diagram-sync --format svg
-```
-
-Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
-
-### Job Options
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `name` | `string` | Label for the job (used in logs) |
-| `type` | `string` | Diagram provider (`plantuml`, `mermaid`, `graphviz`, `drawio`, `d2`, `excalidraw`, `bpmn`) |
-| `format` | `string` | Output format for this job (e.g. `png`, `svg`, `pdf`) — overrides global format |
 
 ---
 
@@ -142,11 +89,13 @@ Format resolution order: `--format` flag → job `format` → global `format` �
 npx diagram-sync
 ```
 
+![demo](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo.gif)
+
 ### 2. npm script
 
 ```json
 "scripts": {
-  "diagrams": "diagram-sync"
+  "diagrams": "npx diagram-sync"
 }
 ```
 
@@ -154,12 +103,14 @@ npx diagram-sync
 npm run diagrams
 ```
 
+![demo-npm](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-npm.gif)
+
 ### 3. Regenerate specific files only
 
 Pass explicit paths — skips discovery entirely. Used by CI to regenerate only the files changed in a push or PR.
 
 ```bash
-npx diagram-sync --files src/auth.puml docs/flow.mmd
+npx diagram-sync --files docs/providers/d2/network.d2 docs/providers/plantuml/system.puml
 ```
 
 ![demo-files](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-files.gif)
@@ -174,7 +125,50 @@ npx diagram-sync --changed
 
 ![demo-changed](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-changed.gif)
 
-### 5. CI/CD
+### 5. Config file
+
+Config is optional — no config file needed to get started. Add `diagram-sync.config.json` to your project root to control formats per provider or scope which providers run.
+
+```json
+{
+  "format": "svg",
+  "jobs": [
+    {
+      "name": "architecture",
+      "type": "plantuml",
+      "format": "png"
+    },
+    {
+      "name": "flows",
+      "type": "mermaid"
+    }
+  ]
+}
+```
+
+```bash
+npx diagram-sync --config diagram-sync.config.json
+```
+
+Override format at runtime without a config file:
+
+```bash
+npx diagram-sync --format svg
+```
+
+Format resolution order: `--format` flag → job `format` → global `format` → default `svg`.
+
+![demo-config](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-config.gif)
+
+#### Job Options
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | Label for the job (used in logs) |
+| `type` | `string` | Diagram provider (`plantuml`, `mermaid`, `graphviz`, `drawio`, `d2`, `excalidraw`, `bpmn`) |
+| `format` | `string` | Output format for this job (e.g. `png`, `svg`, `pdf`) — overrides global format |
+
+### 6. CI/CD
 
 Generates a preview on every PR and commits images to `main` on merge.
 
