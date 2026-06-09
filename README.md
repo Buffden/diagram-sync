@@ -55,7 +55,7 @@ docs/flows/auth.mmd                  →  diagrams/docs/flows/auth.svg
 src/infra/pipeline.dot               →  diagrams/src/infra/pipeline.svg
 src/infra/network.d2                 →  diagrams/src/infra/network.svg
 docs/architecture/sketch.excalidraw  →  diagrams/docs/architecture/sketch.svg
-docs/processes/checkout.bpmn         →  diagrams/docs/processes/checkout.png
+docs/processes/checkout.bpmn         →  diagrams/docs/processes/checkout.svg
 ```
 
 Reference in your README:
@@ -122,25 +122,15 @@ Format resolution order: `--format` flag → job `format` → global `format` �
 
 `diagram-sync` supports any diagram source that is committed to Git, maintained as a file, and can be converted to an image via a CLI — regardless of whether it was created by hand, a GUI tool, or AI.
 
-| Provider | Extensions | Status | Guide |
-| --- | --- | --- | --- |
-| PlantUML | `.puml`, `.plantuml` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/plantuml) |
-| Mermaid | `.mmd`, `.mermaid` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/mermaid) |
-| Graphviz | `.dot`, `.gv` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz) |
-| Draw.io | `.drawio`, `.dio` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio) |
-| D2 | `.d2` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2) |
-| Excalidraw | `.excalidraw` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw) |
-| BPMN | `.bpmn` | Supported | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/bpmn) |
-| Structurizr DSL | `.dsl` | Planned | — |
-| Vega / Vega-Lite | `.vg.json`, `.vl.json` | Planned | — |
-| Gnuplot | `.gp`, `.gnuplot` | Planned | — |
-| Svgbob | `.bob` | Planned | — |
-| WaveDrom | `.waveform` | Planned | — |
-| Ditaa | `.ditaa` | Planned | — |
-| Pikchr | `.pikchr` | Planned | — |
-| Nomnoml | `.nomnoml` | Planned | — |
-| Mscgen | `.msc` | Planned | — |
-| Asymptote | `.asy` | Planned | — |
+| Provider | Extensions | Guide |
+| --- | --- | --- |
+| PlantUML | `.puml`, `.plantuml` | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/plantuml) |
+| Mermaid | `.mmd`, `.mermaid` | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/mermaid) |
+| Graphviz | `.dot`, `.gv` | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz) |
+| Draw.io | `.drawio`, `.dio` | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio) |
+| D2 | `.d2` | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2) |
+| Excalidraw | `.excalidraw` | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw) |
+| BPMN | `.bpmn` | [Setup & CI/CD](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/bpmn) |
 
 ---
 
@@ -229,7 +219,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
 
@@ -294,7 +284,7 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
 
@@ -369,7 +359,7 @@ Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets.
   - **Draw.io:** requires `draw.io` and `xvfb` (Linux only) — `diagram-sync` auto-uses `xvfb-run` for headless rendering when no display is available — see [Draw.io guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio)
   - **D2:** see [D2 guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/d2)
   - **Excalidraw:** requires `@swiftlysingh/excalidraw-cli` — SVG and PNG, no browser required — see [Excalidraw guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/excalidraw)
-  - **BPMN:** requires `bpmn-to-image` — PNG and PDF only — on CI, patch with `--no-sandbox` after install (see [BPMN guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/bpmn))
+  - **BPMN:** requires `bpmn-to-image` — SVG, PNG and PDF — on CI, patch with `--no-sandbox` after install (see [BPMN guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/bpmn))
 
 Providers are detected at runtime and missing ones are skipped with a warning.
 
