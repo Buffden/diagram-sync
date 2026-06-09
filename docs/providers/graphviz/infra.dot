@@ -7,4 +7,8 @@ digraph infra {
     API2 -> Database
     API1 -> Cache
     API2 -> Cache
+    Cache -> Redis
+    API1 -> MessageQueue
+    API2 -> MessageQueue
+    MessageQueue -> Worker
 }

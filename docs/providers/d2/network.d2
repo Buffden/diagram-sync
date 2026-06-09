@@ -8,4 +8,8 @@ client -> api: request
 api -> cache: lookup
 api -> db: query
 db -> api: result
+cache -> api: hit
+api -> queue: async task
+queue -> worker: process
+worker -> db: write
 api -> client: response
