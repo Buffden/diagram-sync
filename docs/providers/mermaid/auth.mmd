@@ -1,5 +1,6 @@
 graph TD
     A[User] -->|Login| B[Auth Service]
     B -->|Validate| C[Database]
-    C -->|Token| B
-    B -->|JWT| A
+    C -->|User record| B
+    B -->|Sign| D[Token Service]
+    D -->|JWT| A
