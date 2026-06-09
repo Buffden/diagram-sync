@@ -5,6 +5,7 @@ vars: {
 }
 
 client -> api: request
+api -> cache: lookup
 api -> db: query
 db -> api: result
 api -> client: response

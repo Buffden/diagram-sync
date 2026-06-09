@@ -1,6 +1,8 @@
 @startuml
 Client -> API : request
-API -> DB : query\nAPI -> Cache : lookup
+API -> Cache : lookup
+Cache --> API : miss
+API -> DB : query
 DB --> API : result
 API --> Client : response
 @enduml

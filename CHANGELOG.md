@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.5.1] — 2026-06-09
+
+### Fixed
+
+- Published dist was built from stale source — `--files` and `--changed` flags were missing from the npm package
+
+---
+
 ## [3.5.0] — 2026-06-09
 
 ### Fixed
@@ -17,11 +25,14 @@ All notable changes to this project will be documented here.
 
 ### Added
 
+- `--changed` flag: generates only files modified since the last commit (`git diff HEAD` + untracked) — avoids full repo scan on every local edit
+- `--files <paths...>` flag: accepts explicit file paths and skips discovery — used by CI to regenerate only files changed in a push or PR
 - ESLint flat config (`eslint.config.mjs`) with TypeScript rules: tab indentation, `eqeqeq`, `no-var`, `prefer-const`, `no-duplicate-imports`, `consistent-type-imports`, `no-explicit-any` (warn), `no-non-null-assertion` (warn)
 - `lint` and `lint:fix` npm scripts
 
 ### Changed
 
+- CI workflow updated to detect changed diagram files via `git diff` and pass them via `--files` — prevents regenerating all diagrams on every workflow run; `workflow_dispatch` retains full scan as fallback
 - Tab indentation enforced across all source and test files
 
 ### Docs
