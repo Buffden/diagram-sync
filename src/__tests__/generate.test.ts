@@ -127,4 +127,39 @@ describe('generateDiagrams', () => {
 		generateDiagrams(['/repo/flow.mock'], root, config);
 		expect(mockLog.success).toHaveBeenCalled();
 	});
+
+	it('only calls check() once per provider when processing multiple files in a single call', () => {
+		const provider = makeMockProvider();
+		mockGetProvider.mockReturnValue(provider);
+		generateDiagrams(['/repo/a.mock', '/repo/b.mock', '/repo/c.mock'], root, config);
+		expect(provider.check).toHaveBeenCalledTimes(1);
+	});
+
+	it('does not carry provider availability state between separate generateDiagrams calls', () => {
+		const provider = makeMockProvider({
+			check: vi.fn()
+				.mockReturnValueOnce({ available: false, message: 'not found' })
+				.mockReturnValueOnce({ available: true }),
+		});
+		mockGetProvider.mockReturnValue(provider);
+
+		// first call: provider unavailable — generate should not be called
+		generateDiagrams(['/repo/flow.mock'], root, config);
+		expect(provider.generate).not.toHaveBeenCalled();
+
+		// second call: provider now available — generate should be called
+		generateDiagrams(['/repo/flow.mock'], root, config);
+		expect(provider.generate).toHaveBeenCalledTimes(1);
+	});
+
+	it('skips check() for unavailable provider on subsequent files in same call', () => {
+		const provider = makeMockProvider({
+			check: vi.fn(() => ({ available: false, message: 'not found' })),
+		});
+		mockGetProvider.mockReturnValue(provider);
+		generateDiagrams(['/repo/a.mock', '/repo/b.mock'], root, config);
+		// check is cached — should only be called once despite two files
+		expect(provider.check).toHaveBeenCalledTimes(1);
+		expect(provider.generate).not.toHaveBeenCalled();
+	});
 });
