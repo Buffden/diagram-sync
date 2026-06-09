@@ -20,12 +20,11 @@ describe('d2Provider metadata', () => {
     expect(d2Provider.extensions).toContain('.d2');
   });
 
-  it('supports svg and png formats', () => {
-    expect(d2Provider.supportedFormats).toEqual(expect.arrayContaining(['svg', 'png']));
+  it('supports svg, png and pdf formats', () => {
+    expect(d2Provider.supportedFormats).toEqual(expect.arrayContaining(['svg', 'png', 'pdf']));
   });
 
-  it('does not support pdf or gif', () => {
-    expect(d2Provider.supportedFormats).not.toContain('pdf');
+  it('does not support gif', () => {
     expect(d2Provider.supportedFormats).not.toContain('gif');
   });
 
@@ -85,8 +84,18 @@ describe('d2Provider.generate', () => {
     );
   });
 
+  it('calls d2 with input and output file for pdf', () => {
+    mockSpawnSync.mockReturnValue({ status: 0 } as any);
+    d2Provider.generate('/repo/arch.d2', '/repo/diagrams', 'pdf');
+    expect(mockSpawnSync).toHaveBeenCalledWith(
+      'd2',
+      ['/repo/arch.d2', '/repo/diagrams/arch.pdf'],
+      expect.any(Object),
+    );
+  });
+
   it('throws on unsupported format', () => {
-    expect(() => d2Provider.generate('/repo/arch.d2', '/out', 'pdf')).toThrow(
+    expect(() => d2Provider.generate('/repo/arch.d2', '/out', 'gif')).toThrow(
       /does not support format/,
     );
   });
