@@ -136,7 +136,8 @@ Config is optional — no config file needed to get started. Add `diagram-sync.c
     {
       "name": "architecture",
       "type": "plantuml",
-      "format": "png"
+      "format": "png",
+      "background": "#FFFFFF"
     },
     {
       "name": "flows",
@@ -167,6 +168,7 @@ Format resolution order: `--format` flag → job `format` → global `format` �
 | `name` | `string` | Label for the job (used in logs) |
 | `type` | `string` | Diagram provider (`plantuml`, `mermaid`, `graphviz`, `drawio`, `d2`, `excalidraw`, `bpmn`) |
 | `format` | `string` | Output format for this job (e.g. `png`, `svg`, `pdf`) — overrides global format |
+| `background` | `string` | Background color for PlantUML diagrams — defaults to `#FFFFFF`. Accepts hex codes or named colors (e.g. `transparent`, `#F5F5F5`) |
 
 ### 6. CI/CD
 

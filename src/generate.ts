@@ -75,7 +75,7 @@ export function generateDiagrams(files: string[], root: string, config: Config, 
 		const outputFile = `diagrams/${relative.replace(/\.[^.]+$/, '.' + format)}`;
 
 		try {
-			provider.generate(file, outputDir, format);
+			provider.generate(file, outputDir, format, { background: job?.background });
 			log.success(`Generated: ${outputFile}`);
 			success++;
 		} catch (err) {

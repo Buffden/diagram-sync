@@ -64,14 +64,14 @@ describe('generateDiagrams', () => {
 		const provider = makeMockProvider({ name: 'mock' });
 		mockGetProvider.mockReturnValue(provider);
 		generateDiagrams(['/repo/flow.mock'], root, config);
-		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'svg');
+		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'svg', expect.any(Object));
 	});
 
 	it('uses cli format when provided', () => {
 		const provider = makeMockProvider({ name: 'mock' });
 		mockGetProvider.mockReturnValue(provider);
 		generateDiagrams(['/repo/flow.mock'], root, config, 'svg');
-		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'svg');
+		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'svg', expect.any(Object));
 	});
 
 	it('uses job format over global format', () => {
@@ -79,7 +79,7 @@ describe('generateDiagrams', () => {
 		mockGetProvider.mockReturnValue(provider);
 		const cfg = { format: 'svg', jobs: [{ name: 'mock', type: 'mock', format: 'png' }] };
 		generateDiagrams(['/repo/flow.mock'], root, cfg);
-		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'png');
+		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'png', expect.any(Object));
 	});
 
 	it('errors when explicit format is unsupported by provider', () => {
@@ -100,7 +100,7 @@ describe('generateDiagrams', () => {
 		// no explicit format — system default 'svg' is unsupported by this provider
 		generateDiagrams(['/repo/flow.mock'], root, config);
 		expect(mockLog.warn).toHaveBeenCalledWith(expect.stringMatching(/does not support/i));
-		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'png');
+		expect(provider.generate).toHaveBeenCalledWith('/repo/flow.mock', expect.any(String), 'png', expect.any(Object));
 	});
 
 	it('counts failed files when provider is unavailable', () => {

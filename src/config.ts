@@ -8,6 +8,7 @@ export interface Job {
 	name: string;
 	type: ProviderType;
 	format?: string;
+	background?: string;
 }
 
 export interface Config {

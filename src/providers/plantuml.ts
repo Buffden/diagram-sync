@@ -1,5 +1,7 @@
 import { spawnSync } from 'child_process';
-import { type DiagramProvider } from './types';
+import { type DiagramProvider, type GenerateOptions } from './types';
+
+const DEFAULT_BACKGROUND = '#FFFFFF';
 
 const FORMAT_FLAGS: Record<string, string> = {
 	png: '-tpng',
@@ -25,12 +27,17 @@ export const plantumlProvider: DiagramProvider = {
 		return { available: true };
 	},
 
-	generate(file: string, outputDir: string, format: string) {
+	generate(file: string, outputDir: string, format: string, options?: GenerateOptions) {
 		const flag = FORMAT_FLAGS[format];
 		if (!flag) {
 			throw new Error(`plantuml does not support format "${format}". Supported: ${this.supportedFormats.join(', ')}`);
 		}
-		const result = spawnSync('plantuml', [flag, '-o', outputDir, file], { encoding: 'utf-8' });
+		const bg = options?.background || DEFAULT_BACKGROUND;
+		const result = spawnSync(
+			'plantuml',
+			[flag, '--skinparam', `backgroundColor=${bg}`, '-o', outputDir, file],
+			{ encoding: 'utf-8' },
+		);
 		if (result.error || result.status !== 0) {
 			throw new Error(result.stderr || result.error?.message || 'plantuml render failed');
 		}

@@ -4,6 +4,21 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.6.0] — 2026-06-22
+
+### Added
+
+- PlantUML diagrams now render with a **white background by default** (`#FFFFFF`) — fixes sequence diagrams appearing transparent on GitHub in dark mode
+- New `background` job option for PlantUML: accepts any hex color (e.g. `#F5F5F5`) or named color (e.g. `transparent`) supported by PlantUML's `skinparam backgroundColor`
+- Background is applied via `--skinparam backgroundColor` at render time — works across all PlantUML output formats (`svg`, `png`, `eps`, `pdf`)
+
+### Docs
+
+- `docs/providers/plantuml/README.md`: added Background Color section with default, custom color, and transparent usage examples
+- `README.md`: `background` field added to Job Options table and config example
+
+---
+
 ## [3.5.2] — 2026-06-09
 
 ### Fixed
