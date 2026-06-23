@@ -56,22 +56,22 @@ describe('plantumlProvider.check', () => {
 });
 
 describe('plantumlProvider.generate', () => {
-	it('calls plantuml with -tpng flag for png', () => {
+	it('calls plantuml with -tpng flag and default white background for png', () => {
 		mockSpawnSync.mockReturnValue({ status: 0 } as any);
 		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'png');
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'plantuml',
-			['-tpng', '-o', '/repo/diagrams', '/repo/flow.puml'],
+			['-tpng', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
 			expect.any(Object),
 		);
 	});
 
-	it('calls plantuml with -tsvg flag for svg', () => {
+	it('calls plantuml with -tsvg flag and default white background for svg', () => {
 		mockSpawnSync.mockReturnValue({ status: 0 } as any);
 		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'svg');
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'plantuml',
-			['-tsvg', '-o', '/repo/diagrams', '/repo/flow.puml'],
+			['-tsvg', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
 			expect.any(Object),
 		);
 	});
@@ -81,7 +81,7 @@ describe('plantumlProvider.generate', () => {
 		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'eps');
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'plantuml',
-			['-teps', '-o', '/repo/diagrams', '/repo/flow.puml'],
+			['-teps', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
 			expect.any(Object),
 		);
 	});
@@ -91,7 +91,27 @@ describe('plantumlProvider.generate', () => {
 		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'pdf');
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'plantuml',
-			['-tpdf', '-o', '/repo/diagrams', '/repo/flow.puml'],
+			['-tpdf', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
+			expect.any(Object),
+		);
+	});
+
+	it('uses a custom background color from options', () => {
+		mockSpawnSync.mockReturnValue({ status: 0 } as any);
+		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'svg', { background: '#123456' });
+		expect(mockSpawnSync).toHaveBeenCalledWith(
+			'plantuml',
+			['-tsvg', '--skinparam', 'backgroundColor=#123456', '-o', '/repo/diagrams', '/repo/flow.puml'],
+			expect.any(Object),
+		);
+	});
+
+	it('passes transparent background when configured', () => {
+		mockSpawnSync.mockReturnValue({ status: 0 } as any);
+		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'svg', { background: 'transparent' });
+		expect(mockSpawnSync).toHaveBeenCalledWith(
+			'plantuml',
+			['-tsvg', '--skinparam', 'backgroundColor=transparent', '-o', '/repo/diagrams', '/repo/flow.puml'],
 			expect.any(Object),
 		);
 	});

@@ -89,6 +89,42 @@ Format resolution order: `--format` flag → job `format` → global `format` �
 
 ---
 
+## Background Color
+
+By default, `diagram-sync` renders all PlantUML diagrams with a **white background** (`#FFFFFF`). This ensures diagrams display correctly on GitHub in dark mode, where PlantUML sequence diagrams would otherwise render with a transparent background.
+
+To use a custom background color:
+
+```json
+{
+  "jobs": [
+    {
+      "name": "architecture",
+      "type": "plantuml",
+      "background": "#F5F5F5"
+    }
+  ]
+}
+```
+
+To make the background transparent:
+
+```json
+{
+  "jobs": [
+    {
+      "name": "architecture",
+      "type": "plantuml",
+      "background": "transparent"
+    }
+  ]
+}
+```
+
+The `background` field accepts any color value that PlantUML's `skinparam backgroundColor` supports — hex codes (`#RRGGBB`) and named colors (e.g. `white`, `lightyellow`, `transparent`).
+
+---
+
 ## CI/CD
 
 Copy [`workflow.yml`](../../workflow.yml) into `.github/workflows/` in your repo. It generates images on every push and commits them back automatically.

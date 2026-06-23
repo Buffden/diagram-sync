@@ -1,3 +1,7 @@
+export interface GenerateOptions {
+	background?: string;
+}
+
 export interface DiagramProvider {
 	name: string;
 	extensions: string[];
@@ -7,5 +11,5 @@ export interface DiagramProvider {
 		available: boolean;
 		message?: string;
 	};
-	generate(file: string, outputDir: string, format: string): void;
+	generate(file: string, outputDir: string, format: string, options?: GenerateOptions): void;
 }
