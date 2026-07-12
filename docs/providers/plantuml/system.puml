@@ -1,5 +1,5 @@
 @startuml
-' v2
+' v3
 Client -> API : request
 API -> Cache : lookup
 Cache --> API : miss
