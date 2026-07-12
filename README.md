@@ -284,7 +284,7 @@ jobs:
 
       - name: Generate changed diagrams
         run: |
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$')
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$' || true)
           if [ -n "$CHANGED" ]; then
             diagram-sync --files $CHANGED
           else
@@ -365,7 +365,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             diagram-sync
           else
-            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$')
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$' || true)
             if [ -n "$CHANGED" ]; then
               diagram-sync --files $CHANGED
             else
