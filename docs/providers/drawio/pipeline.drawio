@@ -19,6 +19,12 @@
         <mxCell id="6" edge="1" source="3" target="4" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
+        <mxCell id="7" value="Monitor" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="520" y="100" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="8" edge="1" source="4" target="7" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>

@@ -12,4 +12,5 @@ cache -> api: hit
 api -> queue: async task
 queue -> worker: process
 worker -> db: write
+worker -> monitor: metrics
 api -> client: response

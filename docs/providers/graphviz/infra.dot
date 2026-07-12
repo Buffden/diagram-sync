@@ -11,4 +11,5 @@ digraph infra {
     API1 -> MessageQueue
     API2 -> MessageQueue
     MessageQueue -> Worker
+    Worker -> Monitoring
 }
