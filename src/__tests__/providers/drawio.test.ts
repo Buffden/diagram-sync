@@ -69,22 +69,32 @@ describe('drawioProvider.check', () => {
 		expect(drawioProvider.check().available).toBe(false);
 	});
 
+	it('returns unavailable on Linux with no display when drawio binary is not found', () => {
+		delete process.env.DISPLAY;
+		vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+		mockSpawnSync
+			.mockReturnValueOnce({ status: 1, error: undefined } as any); // which drawio
+		const result = drawioProvider.check();
+		expect(result.available).toBe(false);
+		expect(result.message).toMatch(/drawio/i);
+	});
+
 	it('returns unavailable on Linux with no display when xvfb-run is not found', () => {
 		delete process.env.DISPLAY;
 		vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
 		mockSpawnSync
-			.mockReturnValueOnce({ status: 0, error: undefined } as any)  // drawio --version
+			.mockReturnValueOnce({ status: 0, error: undefined } as any)  // which drawio
 			.mockReturnValueOnce({ status: 1, error: undefined } as any); // which xvfb-run
 		const result = drawioProvider.check();
 		expect(result.available).toBe(false);
 		expect(result.message).toMatch(/xvfb/i);
 	});
 
-	it('returns available on Linux with no display when xvfb-run is found', () => {
+	it('returns available on Linux with no display when drawio and xvfb-run are found', () => {
 		delete process.env.DISPLAY;
 		vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
 		mockSpawnSync
-			.mockReturnValueOnce({ status: 0, error: undefined } as any)  // drawio --version
+			.mockReturnValueOnce({ status: 0, error: undefined } as any)  // which drawio
 			.mockReturnValueOnce({ status: 0, error: undefined } as any); // which xvfb-run
 		expect(drawioProvider.check().available).toBe(true);
 	});
