@@ -12,7 +12,7 @@
     <sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Task_2"/>
     <serviceTask id="Task_2" name="Ship Order"/>
     <sequenceFlow id="Flow_3" sourceRef="Task_2" targetRef="EndEvent_1"/>
-    <endEvent id="EndEvent_1" name="Order Complete"/>
+    <endEvent id="EndEvent_1" name="Order Fulfilled"/>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">

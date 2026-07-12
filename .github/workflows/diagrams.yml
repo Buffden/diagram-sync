@@ -50,14 +50,17 @@ jobs:
   diagrams:
     name: Generate Diagrams
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          # PAT_TOKEN is required for push (to commit back to the repo).
-          # On PRs, GITHUB_TOKEN is sufficient and safer — avoids exposing PAT to fork builds.
-          token: ${{ github.event_name == 'pull_request' && secrets.GITHUB_TOKEN || secrets.PAT_TOKEN }}
+          # GITHUB_TOKEN with contents: write is sufficient when the main branch is unprotected.
+          # If your branch is protected and you need to bypass protection rules, replace with a PAT:
+          #   token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           # Full history required so git diff can resolve base refs for --files filtering.
           fetch-depth: 0
 
@@ -85,7 +88,7 @@ jobs:
       # --- Draw.io — remove if not using .drawio / .dio files ---
       - name: Install Draw.io
         run: |
-          DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
+          DRAWIO_VERSION="30.3.6"
           wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
           sudo apt-get install -y ./drawio.deb xvfb
 
@@ -111,14 +114,14 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             diagram-sync
           elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$')
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$' || true)
             if [ -n "$CHANGED" ]; then
               diagram-sync --files $CHANGED
             else
               echo "No diagram files changed."
             fi
           else
-            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$')
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$' || true)
             if [ -n "$CHANGED" ]; then
               diagram-sync --files $CHANGED
             else
