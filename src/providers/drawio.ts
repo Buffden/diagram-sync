@@ -9,19 +9,30 @@ export const drawioProvider: DiagramProvider = {
 	defaultFormat: 'svg',
 
 	check() {
-		const result = spawnSync('drawio', ['--version'], { encoding: 'utf-8' });
-		if (result.error || result.status !== 0) {
-			return {
-				available: false,
-				message: 'drawio not found. Install it from https://www.drawio.com or via: brew install --cask drawio',
-			};
-		}
-		if (process.platform === 'linux' && !process.env.DISPLAY) {
+		const isLinuxHeadless = process.platform === 'linux' && !process.env.DISPLAY;
+		if (isLinuxHeadless) {
+			// drawio --version requires a display and will fail without one.
+			// Check binary existence via `which` instead.
+			const which = spawnSync('which', ['drawio'], { encoding: 'utf-8' });
+			if (which.status !== 0) {
+				return {
+					available: false,
+					message: 'drawio not found. Install it from https://www.drawio.com or via: brew install --cask drawio',
+				};
+			}
 			const xvfb = spawnSync('which', ['xvfb-run'], { encoding: 'utf-8' });
 			if (xvfb.status !== 0) {
 				return {
 					available: false,
 					message: 'draw.io requires a display or xvfb-run on Linux. Install via: sudo apt-get install -y xvfb',
+				};
+			}
+		} else {
+			const result = spawnSync('drawio', ['--version'], { encoding: 'utf-8' });
+			if (result.error || result.status !== 0) {
+				return {
+					available: false,
+					message: 'drawio not found. Install it from https://www.drawio.com or via: brew install --cask drawio',
 				};
 			}
 		}
