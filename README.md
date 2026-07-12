@@ -302,11 +302,16 @@ jobs:
     name: Generate and Commit
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v5
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          # GITHUB_TOKEN with contents: write is sufficient when the main branch is unprotected.
+          # If your branch is protected and you need to bypass protection rules, replace with a PAT:
+          #   token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           # Full history required so git diff can resolve base refs for --files filtering.
           fetch-depth: 0
 
@@ -382,7 +387,7 @@ jobs:
           fi
 ```
 
-Requires a PAT with `contents: write` saved as `PAT_TOKEN` in your repo secrets. See the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)** for the ready-to-use workflow file.
+No secrets setup required — `GITHUB_TOKEN` with `contents: write` works out of the box for unprotected branches. If your main branch is protected and you need to push through branch protection rules, replace `secrets.GITHUB_TOKEN` with a PAT saved as `PAT_TOKEN`. See the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)** for the ready-to-use workflow file.
 
 ---
 

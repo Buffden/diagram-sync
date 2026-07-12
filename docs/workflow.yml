@@ -123,11 +123,16 @@ jobs:
     name: Generate and Commit
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v5
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          # GITHUB_TOKEN with contents: write is sufficient when the main branch is unprotected.
+          # If your branch is protected and you need to bypass protection rules, replace with a PAT:
+          #   token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           # Full history required so git diff can resolve base refs for --files filtering.
           fetch-depth: 0
 
