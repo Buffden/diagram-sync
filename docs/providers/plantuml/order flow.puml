@@ -1,8 +1,0 @@
-@startuml Order Flow
-' v1
-actor Customer
-Customer -> Shop : place order
-Shop -> Payments : charge card
-Payments --> Shop : approved
-Shop --> Customer : confirmation
-@enduml

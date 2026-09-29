@@ -1,4 +1,0 @@
-// v1
-digraph network {
-    client -> gateway -> service
-}

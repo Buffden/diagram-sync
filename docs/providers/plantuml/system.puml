@@ -1,10 +1,9 @@
 @startuml
-' v4
+' v3
 Client -> API : request
 API -> Cache : lookup
 Cache --> API : miss
 Cache --> API : hit
-API -> Cache : store
 API -> DB : query
 DB --> API : result
 API --> Client : response
