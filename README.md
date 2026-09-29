@@ -125,6 +125,12 @@ npx diagram-sync --changed
 
 ![demo-changed](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-changed.gif)
 
+#### Exit codes and output names
+
+`diagram-sync` exits with code 1 if any diagram fails to render, including a missing provider tool or a source file that doesn't exist, so CI jobs fail instead of passing silently.
+
+Each source `path/to/name.ext` is written to `diagrams/path/to/name.<format>`, whatever title the diagram declares (for example `@startuml My Title`). If two sources in one folder share a name, such as `architecture.puml` and `architecture.excalidraw`, they write the same file; diagram-sync warns about it, and you should rename one of them.
+
 ### 5. Config file
 
 Config is optional — no config file needed to get started. Add `diagram-sync.config.json` to your project root to control formats per provider or scope which providers run.
@@ -297,7 +303,10 @@ jobs:
             | xargs -0 -r diagram-sync --files
         # add --format png or --format pdf after --files to override the default svg output
 
+      # !cancelled() so previews of the diagrams that did render are still
+      # uploaded when another one fails
       - name: Upload diagram previews
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: diagrams-preview
@@ -367,7 +376,11 @@ jobs:
       - name: Install diagram-sync
         run: npm install -g diagram-sync
 
+      # continue-on-error so one broken diagram doesn't stop the others from being
+      # committed. The last step still fails the job if anything failed here.
       - name: Generate diagrams
+        id: generate
+        continue-on-error: true
         env:
           EVENT_NAME: ${{ github.event_name }}
           BEFORE_SHA: ${{ github.event.before }}
@@ -397,6 +410,13 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+      # outcome, not conclusion: continue-on-error turns the conclusion into success
+      - name: Fail if any diagram failed to render
+        if: steps.generate.outcome == 'failure'
+        run: |
+          echo "::error::Some diagrams failed to render. The ones that succeeded were committed; see the Generate diagrams step for details."
+          exit 1
 ```
 
 No secrets setup required — `GITHUB_TOKEN` with `contents: write` works out of the box for unprotected branches. If your main branch is protected and blocks pushes from `GITHUB_TOKEN`, save a fine-grained PAT (Contents: read and write) as the `PAT_TOKEN` secret; the workflow picks it up automatically. See the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)** for the ready-to-use workflow file.

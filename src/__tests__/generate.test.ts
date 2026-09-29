@@ -1,5 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { type DiagramProvider } from '../providers/types';
 
 // Suppress console output during tests
@@ -161,5 +163,90 @@ describe('generateDiagrams', () => {
 		// check is cached — should only be called once despite two files
 		expect(provider.check).toHaveBeenCalledTimes(1);
 		expect(provider.generate).not.toHaveBeenCalled();
+	});
+	it('returns the number of successes and failures', () => {
+		const provider = makeMockProvider({
+			generate: vi.fn()
+				.mockImplementationOnce(() => undefined)
+				.mockImplementationOnce(() => { throw new Error('render error'); }),
+		});
+		mockGetProvider.mockReturnValue(provider);
+		expect(generateDiagrams(['/repo/a.mock', '/repo/b.mock'], root, config)).toEqual({ success: 1, failed: 1 });
+	});
+
+	it('counts an unavailable provider as a failure', () => {
+		mockGetProvider.mockReturnValue(makeMockProvider({
+			check: vi.fn(() => ({ available: false, message: 'not found' })),
+		}));
+		expect(generateDiagrams(['/repo/a.mock'], root, config).failed).toBe(1);
+	});
+
+	it('counts an explicit unsupported format as a failure', () => {
+		mockGetProvider.mockReturnValue(makeMockProvider());
+		expect(generateDiagrams(['/repo/flow.mock'], root, config, 'eps').failed).toBe(1);
+	});
+
+	it('returns zero counts when no files are given', () => {
+		expect(generateDiagrams([], root, config)).toEqual({ success: 0, failed: 0 });
+	});
+
+	it('logs the paths a provider reports it wrote', () => {
+		mockGetProvider.mockReturnValue(makeMockProvider({
+			generate: vi.fn(() => ['/repo/diagrams/flow.svg', '/repo/diagrams/flow_001.svg']),
+		}));
+		generateDiagrams(['/repo/flow.mock'], root, config);
+		expect(mockLog.success).toHaveBeenCalledWith('Generated: diagrams/flow.svg');
+		expect(mockLog.success).toHaveBeenCalledWith('Generated: diagrams/flow_001.svg');
+	});
+
+	it('logs the computed output path when the provider reports none', () => {
+		mockGetProvider.mockReturnValue(makeMockProvider());
+		generateDiagrams(['/repo/docs/flow.mock'], root, config);
+		expect(mockLog.success).toHaveBeenCalledWith(`Generated: ${path.join('diagrams', 'docs', 'flow.svg')}`);
+	});
+});
+
+describe('output clash warning', () => {
+	let tmpDir: string;
+	const puml = makeMockProvider({ name: 'plantuml', extensions: ['.puml'], defaultFormat: 'svg' });
+	const mmd = makeMockProvider({ name: 'mermaid', extensions: ['.mmd'], defaultFormat: 'svg' });
+	const config = { jobs: [{ name: 'plantuml', type: 'plantuml' }, { name: 'mermaid', type: 'mermaid' }] };
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'diagram-sync-clash-'));
+		fs.writeFileSync(path.join(tmpDir, 'arch.puml'), '');
+		fs.writeFileSync(path.join(tmpDir, 'arch.mmd'), '');
+		mockGetProvider.mockImplementation((ext) => ({ '.puml': puml, '.mmd': mmd } as Record<string, DiagramProvider>)[ext]);
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+		mockGetProvider.mockReset();
+	});
+
+	const clashWarnings = () => mockLog.warn.mock.calls.filter(([msg]) => /output clash/i.test(msg));
+
+	it('warns when two sources write the same output, and still renders both', () => {
+		const result = generateDiagrams([path.join(tmpDir, 'arch.puml'), path.join(tmpDir, 'arch.mmd')], tmpDir, config);
+		expect(clashWarnings()).toHaveLength(1);
+		expect(result).toEqual({ success: 2, failed: 0 });
+	});
+
+	it('warns about a same-named sibling that was not passed in', () => {
+		generateDiagrams([path.join(tmpDir, 'arch.puml')], tmpDir, config);
+		expect(clashWarnings()).toHaveLength(1);
+		expect(clashWarnings()[0][0]).toMatch(/arch\.puml and arch\.mmd|arch\.mmd and arch\.puml/);
+	});
+
+	it('does not warn when the formats differ', () => {
+		const cfg = { jobs: [{ name: 'plantuml', type: 'plantuml', format: 'png' }, { name: 'mermaid', type: 'mermaid' }] };
+		generateDiagrams([path.join(tmpDir, 'arch.puml')], tmpDir, cfg);
+		expect(clashWarnings()).toHaveLength(0);
+	});
+
+	it('ignores siblings whose provider is not active', () => {
+		generateDiagrams([path.join(tmpDir, 'arch.puml')], tmpDir, { jobs: [{ name: 'plantuml', type: 'plantuml' }] });
+		expect(clashWarnings()).toHaveLength(0);
 	});
 });

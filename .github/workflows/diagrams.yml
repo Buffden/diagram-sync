@@ -1,7 +1,7 @@
 name: Generate and Commit Diagrams
 
-# Remove path entries for providers you don't use.
-# The workflow only triggers when a matching source file changes.
+# Triggers when a diagram source or the diagram-sync code itself changes.
+# The reference copy for other projects lives in the README.
 on:
   pull_request:
     paths:
@@ -23,6 +23,11 @@ on:
       - '**/*.excalidraw'
       # BPMN — remove if not using .bpmn files
       - '**/*.bpmn'
+      # diagram-sync itself — re-run when the package code changes
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/diagrams.yml'
   push:
     branches: [main]
     paths:
@@ -44,6 +49,11 @@ on:
       - '**/*.excalidraw'
       # BPMN — remove if not using .bpmn files
       - '**/*.bpmn'
+      # diagram-sync itself — re-run when the package code changes
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/diagrams.yml'
   workflow_dispatch:
 
 # Keep in sync with the providers you use. Paths are NUL-separated end to end
@@ -106,8 +116,13 @@ jobs:
           npm install -g bpmn-to-image
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
-      - name: Install diagram-sync
-        run: npm install -g diagram-sync
+      # This repo builds diagram-sync from the checked-out source so each PR tests
+      # its own code. Projects using the package should `npm install -g diagram-sync`.
+      - name: Build diagram-sync from source
+        run: |
+          npm ci
+          npm run build
+          npm link
 
       - name: Generate changed diagrams
         env:
@@ -118,7 +133,10 @@ jobs:
             | xargs -0 -r diagram-sync --files
         # add --format png or --format pdf after --files to override the default svg output
 
+      # !cancelled() so previews of the diagrams that did render are still
+      # uploaded when another one fails
       - name: Upload diagram previews
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: diagrams-preview
@@ -185,10 +203,19 @@ jobs:
           npm install -g bpmn-to-image
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
-      - name: Install diagram-sync
-        run: npm install -g diagram-sync
+      # This repo builds diagram-sync from the checked-out source so each PR tests
+      # its own code. Projects using the package should `npm install -g diagram-sync`.
+      - name: Build diagram-sync from source
+        run: |
+          npm ci
+          npm run build
+          npm link
 
+      # continue-on-error so one broken diagram doesn't stop the others from being
+      # committed. The last step still fails the job if anything failed here.
       - name: Generate diagrams
+        id: generate
+        continue-on-error: true
         env:
           EVENT_NAME: ${{ github.event_name }}
           BEFORE_SHA: ${{ github.event.before }}
@@ -218,3 +245,10 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+      # outcome, not conclusion: continue-on-error turns the conclusion into success
+      - name: Fail if any diagram failed to render
+        if: steps.generate.outcome == 'failure'
+        run: |
+          echo "::error::Some diagrams failed to render. The ones that succeeded were committed; see the Generate diagrams step for details."
+          exit 1

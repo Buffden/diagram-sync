@@ -1,5 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { spawnSync } from 'child_process';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 vi.mock('child_process');
 
@@ -55,65 +58,78 @@ describe('plantumlProvider.check', () => {
 	});
 });
 
+// Simulates plantuml writing the given file names into its -o folder
+function renders(...names: string[]) {
+	mockSpawnSync.mockImplementation(((_cmd: string, args: string[]) => {
+		const dir = args[args.indexOf('-o') + 1];
+		for (const name of names) fs.writeFileSync(path.join(dir, name), 'out');
+		return { status: 0 };
+	}) as any);
+}
+
 describe('plantumlProvider.generate', () => {
-	it('calls plantuml with -tpng flag and default white background for png', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'png');
+	let outDir: string;
+
+	beforeEach(() => {
+		outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'diagram-sync-puml-test-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(outDir, { recursive: true, force: true });
+	});
+
+	it.each([
+		['png', '-tpng'],
+		['svg', '-tsvg'],
+		['eps', '-teps'],
+		['pdf', '-tpdf'],
+	])('calls plantuml with the %s flag and default white background', (format, flag) => {
+		renders(`flow.${format}`);
+		plantumlProvider.generate('/repo/flow.puml', outDir, format);
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'plantuml',
-			['-tpng', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
+			[flag, '--skinparam', 'backgroundColor=#FFFFFF', '-o', expect.any(String), '/repo/flow.puml'],
 			expect.any(Object),
 		);
 	});
 
-	it('calls plantuml with -tsvg flag and default white background for svg', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'svg');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'plantuml',
-			['-tsvg', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls plantuml with -teps flag for eps', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'eps');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'plantuml',
-			['-teps', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls plantuml with -tpdf flag for pdf', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'pdf');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'plantuml',
-			['-tpdf', '--skinparam', 'backgroundColor=#FFFFFF', '-o', '/repo/diagrams', '/repo/flow.puml'],
-			expect.any(Object),
-		);
+	it('renders into a temp folder and cleans it up', () => {
+		renders('flow.svg');
+		plantumlProvider.generate('/repo/flow.puml', outDir, 'svg');
+		const args = mockSpawnSync.mock.calls[0][1] as string[];
+		const scratch = args[args.indexOf('-o') + 1];
+		expect(scratch).not.toBe(outDir);
+		expect(fs.existsSync(scratch)).toBe(false);
 	});
 
 	it('uses a custom background color from options', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'svg', { background: '#123456' });
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'plantuml',
-			['-tsvg', '--skinparam', 'backgroundColor=#123456', '-o', '/repo/diagrams', '/repo/flow.puml'],
-			expect.any(Object),
-		);
+		renders('flow.svg');
+		plantumlProvider.generate('/repo/flow.puml', outDir, 'svg', { background: '#123456' });
+		expect(mockSpawnSync.mock.calls[0][1]).toContain('backgroundColor=#123456');
 	});
 
 	it('passes transparent background when configured', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		plantumlProvider.generate('/repo/flow.puml', '/repo/diagrams', 'svg', { background: 'transparent' });
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'plantuml',
-			['-tsvg', '--skinparam', 'backgroundColor=transparent', '-o', '/repo/diagrams', '/repo/flow.puml'],
-			expect.any(Object),
-		);
+		renders('flow.svg');
+		plantumlProvider.generate('/repo/flow.puml', outDir, 'svg', { background: 'transparent' });
+		expect(mockSpawnSync.mock.calls[0][1]).toContain('backgroundColor=transparent');
+	});
+
+	it('names the output after the source file, not the @startuml title', () => {
+		renders('Order Flow.png');
+		const written = plantumlProvider.generate('/repo/docs/order flow.puml', outDir, 'png');
+		expect(written).toEqual([path.join(outDir, 'order flow.png')]);
+		expect(fs.readdirSync(outDir)).toEqual(['order flow.png']);
+	});
+
+	it('keeps plantuml names when a file contains several diagrams', () => {
+		renders('flow.svg', 'flow_001.svg');
+		const written = plantumlProvider.generate('/repo/flow.puml', outDir, 'svg');
+		expect(written).toEqual([path.join(outDir, 'flow.svg'), path.join(outDir, 'flow_001.svg')]);
+	});
+
+	it('throws when plantuml writes no output', () => {
+		renders();
+		expect(() => plantumlProvider.generate('/repo/flow.puml', outDir, 'svg')).toThrow(/no \.svg output/);
 	});
 
 	it('throws on unsupported format', () => {
@@ -124,11 +140,11 @@ describe('plantumlProvider.generate', () => {
 
 	it('throws with stderr when plantuml exits non-zero', () => {
 		mockSpawnSync.mockReturnValue({ status: 1, stderr: 'render failed', error: undefined } as any);
-		expect(() => plantumlProvider.generate('/repo/flow.puml', '/out', 'png')).toThrow('render failed');
+		expect(() => plantumlProvider.generate('/repo/flow.puml', outDir, 'png')).toThrow('render failed');
 	});
 
 	it('throws with error message when spawn fails', () => {
 		mockSpawnSync.mockReturnValue({ status: null, error: new Error('ENOENT') } as any);
-		expect(() => plantumlProvider.generate('/repo/flow.puml', '/out', 'png')).toThrow('ENOENT');
+		expect(() => plantumlProvider.generate('/repo/flow.puml', outDir, 'png')).toThrow('ENOENT');
 	});
 });

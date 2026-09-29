@@ -11,5 +11,10 @@ export interface DiagramProvider {
 		available: boolean;
 		message?: string;
 	};
-	generate(file: string, outputDir: string, format: string, options?: GenerateOptions): void;
+	/**
+	 * Renders `file` into `outputDir`. A provider that can't pick the output name
+	 * directly returns the absolute paths it wrote; otherwise the output is
+	 * `<outputDir>/<source basename>.<format>`.
+	 */
+	generate(file: string, outputDir: string, format: string, options?: GenerateOptions): string[] | void;
 }
