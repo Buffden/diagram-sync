@@ -303,7 +303,10 @@ jobs:
             | xargs -0 -r diagram-sync --files
         # add --format png or --format pdf after --files to override the default svg output
 
+      # !cancelled() so previews of the diagrams that did render are still
+      # uploaded when another one fails
       - name: Upload diagram previews
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: diagrams-preview

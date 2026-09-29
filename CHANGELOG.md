@@ -19,6 +19,7 @@ All notable changes to this project will be documented here.
 ### CI
 
 - Commit jobs in this repository's workflow, the README example and `docs/workflow.yml` commit the diagrams that rendered even when another one fails, then fail the job at the end. Pull-request preview jobs fail immediately.
+- Pull-request preview jobs upload the diagrams that rendered even when another one fails, instead of skipping the upload.
 - `docs/workflow.yml` brought back in line with the README example; it had been left on the old version.
 - This repository's diagrams workflow builds diagram-sync from source instead of installing it from npm, so pull requests test their own code. It also runs when `src/` or the package files change.
 
