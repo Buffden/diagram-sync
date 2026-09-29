@@ -373,7 +373,11 @@ jobs:
       - name: Install diagram-sync
         run: npm install -g diagram-sync
 
+      # continue-on-error so one broken diagram doesn't stop the others from being
+      # committed. The last step still fails the job if anything failed here.
       - name: Generate diagrams
+        id: generate
+        continue-on-error: true
         env:
           EVENT_NAME: ${{ github.event_name }}
           BEFORE_SHA: ${{ github.event.before }}
@@ -403,6 +407,13 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+      # outcome, not conclusion: continue-on-error turns the conclusion into success
+      - name: Fail if any diagram failed to render
+        if: steps.generate.outcome == 'failure'
+        run: |
+          echo "::error::Some diagrams failed to render. The ones that succeeded were committed; see the Generate diagrams step for details."
+          exit 1
 ```
 
 No secrets setup required — `GITHUB_TOKEN` with `contents: write` works out of the box for unprotected branches. If your main branch is protected and blocks pushes from `GITHUB_TOKEN`, save a fine-grained PAT (Contents: read and write) as the `PAT_TOKEN` secret; the workflow picks it up automatically. See the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)** for the ready-to-use workflow file.

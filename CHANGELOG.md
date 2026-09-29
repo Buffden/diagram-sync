@@ -9,6 +9,7 @@ All notable changes to this project will be documented here.
 ### Changed
 
 - **`diagram-sync` now exits with code 1 when any diagram fails to render.** This includes syntax errors, a missing provider tool, a `--files` path that doesn't exist, and an explicitly requested format the provider doesn't support. Previously it always exited 0, so CI jobs stayed green on failure. Pipelines that were passing with a broken diagram will now fail.
+  - **Upgrading a workflow copied from an older README:** if its generate and commit steps are in the same job, one failed diagram now fails the generate step, so the commit step is skipped and none of the diagrams that rendered fine in that push get committed. Later pushes only render the files they change, so those images stay stale until edited again. The [updated reference workflow](https://github.com/Buffden/diagram-sync/blob/main/docs/workflow.yml) (also in the README under *CI/CD*) sets `continue-on-error: true` on the commit job's generate step, commits whatever rendered, then fails the job in a final step that checks `steps.generate.outcome == 'failure'`. The pull-request preview job still fails straight away.
 - **PlantUML output is always named after the source file.** A diagram starting with `@startuml <title>` used to be written to `<title>.<format>`, while the log reported `<source name>.<format>`. `docs/order flow.puml` with `@startuml Order Flow` now writes `diagrams/docs/order flow.svg`. If you had titled diagrams, delete the old title-named images from `diagrams/`. Files containing several `@startuml` blocks keep PlantUML's own names, and the log now lists each one.
 
 ### Added
@@ -17,6 +18,8 @@ All notable changes to this project will be documented here.
 
 ### CI
 
+- Commit jobs in this repository's workflow, the README example and `docs/workflow.yml` commit the diagrams that rendered even when another one fails, then fail the job at the end. Pull-request preview jobs fail immediately.
+- `docs/workflow.yml` brought back in line with the README example; it had been left on the old version.
 - This repository's diagrams workflow builds diagram-sync from source instead of installing it from npm, so pull requests test their own code. It also runs when `src/` or the package files change.
 
 ---
