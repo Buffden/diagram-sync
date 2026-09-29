@@ -1,4 +1,4 @@
-# v3
+# v4
 vars: {
   d2-config: {
     layout-engine: elk
@@ -14,4 +14,5 @@ api -> queue: async task
 queue -> worker: process
 worker -> db: write
 worker -> monitor: metrics
+monitor -> api: alerts
 api -> client: response
