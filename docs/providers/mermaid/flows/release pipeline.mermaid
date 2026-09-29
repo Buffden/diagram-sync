@@ -1,0 +1,6 @@
+%% v1
+graph LR
+    A[Merge to main] --> B[Build]
+    B --> C[Test]
+    C --> D[Publish to npm]
+    D --> E[Tag release]

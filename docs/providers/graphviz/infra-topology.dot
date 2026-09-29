@@ -1,4 +1,4 @@
-// v3
+// v4
 digraph infra {
     rankdir=LR
     Client -> LoadBalancer
@@ -13,4 +13,5 @@ digraph infra {
     API2 -> MessageQueue
     MessageQueue -> Worker
     Worker -> Monitoring
+    Monitoring -> Alerting
 }

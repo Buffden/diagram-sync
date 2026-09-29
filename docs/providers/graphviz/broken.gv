@@ -1,0 +1,4 @@
+// v1 — intentionally invalid: exercises render-failure handling in CI
+digraph broken {
+    a -> b -> 
+}
