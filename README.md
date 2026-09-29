@@ -225,6 +225,11 @@ on:
       - '**/*.bpmn'
   workflow_dispatch:
 
+# Keep in sync with the providers you use. Paths are NUL-separated end to end
+# (git diff -z | grep -z | xargs -0) so file names with spaces survive.
+env:
+  DIAGRAM_PATTERN: '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$'
+
 jobs:
   preview:
     name: Generate Preview
@@ -234,7 +239,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Full history required so git diff can resolve base refs for --files filtering.
+          # Full history required so git diff can resolve the base ref.
           fetch-depth: 0
 
       - name: Setup Node
@@ -243,16 +248,17 @@ jobs:
           node-version: '20'
 
       # --- PlantUML — remove if not using .puml / .plantuml files ---
-      - name: Install PlantUML
+      # Graphviz is needed for every PlantUML diagram type except sequence diagrams.
+      - name: Install PlantUML and Graphviz
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       # --- Mermaid — remove if not using .mmd / .mermaid files ---
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
 
-      # --- Graphviz — remove if not using .dot / .gv files ---
+      # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
       - name: Install Graphviz
         run: |
           sudo apt-get update -q
@@ -283,20 +289,20 @@ jobs:
         run: npm install -g diagram-sync
 
       - name: Generate changed diagrams
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$' || true)
-          if [ -n "$CHANGED" ]; then
-            diagram-sync --files $CHANGED
-          else
-            echo "No diagram files changed."
-          fi
-        # add --format png or --format pdf after --files $CHANGED to override the default svg output
+          git diff -z --name-only --diff-filter=d "origin/${BASE_REF}...HEAD" \
+            | { grep -zE "$DIAGRAM_PATTERN" || echo "No diagram files changed." >&2; } \
+            | xargs -0 -r diagram-sync --files
+        # add --format png or --format pdf after --files to override the default svg output
 
       - name: Upload diagram previews
         uses: actions/upload-artifact@v4
         with:
           name: diagrams-preview
           path: diagrams/
+          if-no-files-found: ignore
 
   commit:
     name: Generate and Commit
@@ -308,11 +314,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # GITHUB_TOKEN with contents: write is sufficient when the main branch is unprotected.
-          # If your branch is protected and you need to bypass protection rules, replace with a PAT:
-          #   token: ${{ secrets.PAT_TOKEN }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          # Full history required so git diff can resolve base refs for --files filtering.
+          # GITHUB_TOKEN with contents: write is enough when main is unprotected.
+          # If a branch ruleset blocks pushes from GITHUB_TOKEN, save a fine-grained PAT
+          # (Contents: read+write) as PAT_TOKEN; it is used automatically when present.
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          # Full history required so git diff can resolve the previous commit.
           fetch-depth: 0
 
       - name: Setup Node
@@ -321,16 +327,17 @@ jobs:
           node-version: '20'
 
       # --- PlantUML — remove if not using .puml / .plantuml files ---
-      - name: Install PlantUML
+      # Graphviz is needed for every PlantUML diagram type except sequence diagrams.
+      - name: Install PlantUML and Graphviz
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml
+          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       # --- Mermaid — remove if not using .mmd / .mermaid files ---
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
 
-      # --- Graphviz — remove if not using .dot / .gv files ---
+      # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
       - name: Install Graphviz
         run: |
           sudo apt-get update -q
@@ -360,34 +367,39 @@ jobs:
       - name: Install diagram-sync
         run: npm install -g diagram-sync
 
-      - name: Generate changed diagrams
+      - name: Generate diagrams
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          # Regenerate everything on manual runs, or when there is no previous
+          # commit to diff against (first push / new branch).
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
             diagram-sync
           else
-            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$' || true)
-            if [ -n "$CHANGED" ]; then
-              diagram-sync --files $CHANGED
-            else
-              echo "No diagram files changed."
-            fi
+            git diff -z --name-only --diff-filter=d "$BEFORE_SHA" "$AFTER_SHA" \
+              | { grep -zE "$DIAGRAM_PATTERN" || echo "No diagram files changed." >&2; } \
+              | xargs -0 -r diagram-sync --files
           fi
-        # add --format png or --format pdf after --files $CHANGED to override the default svg output
 
       - name: Commit generated diagrams
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add diagrams/
+          # diagrams/ may not exist yet if nothing has been generated
+          git add diagrams/ 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No diagram changes to commit."
           else
             git commit -m "chore: auto-export diagrams [skip ci]"
+            # main may have moved while diagrams were rendering
+            git pull --rebase origin main
             git push
           fi
 ```
 
-No secrets setup required — `GITHUB_TOKEN` with `contents: write` works out of the box for unprotected branches. If your main branch is protected and you need to push through branch protection rules, replace `secrets.GITHUB_TOKEN` with a PAT saved as `PAT_TOKEN`. See the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)** for the ready-to-use workflow file.
+No secrets setup required — `GITHUB_TOKEN` with `contents: write` works out of the box for unprotected branches. If your main branch is protected and blocks pushes from `GITHUB_TOKEN`, save a fine-grained PAT (Contents: read and write) as the `PAT_TOKEN` secret; the workflow picks it up automatically. See the **[Provider Guides](https://github.com/Buffden/diagram-sync/tree/main/docs/providers)** for the ready-to-use workflow file.
 
 ---
 
@@ -395,7 +407,7 @@ No secrets setup required — `GITHUB_TOKEN` with `contents: write` works out of
 
 - Node.js 20+
 - Each provider requires its own CLI tool — install only what you need:
-  - **PlantUML:** Java 11+ and PlantUML — see [PlantUML guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/plantuml)
+  - **PlantUML:** Java 11+, PlantUML, and Graphviz (needed for every diagram type except sequence diagrams) — see [PlantUML guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/plantuml)
   - **Mermaid:** see [Mermaid guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/mermaid)
   - **Graphviz:** see [Graphviz guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/graphviz)
   - **Draw.io:** requires `draw.io` and `xvfb` (Linux only) — `diagram-sync` auto-uses `xvfb-run` for headless rendering when no display is available — see [Draw.io guide](https://github.com/Buffden/diagram-sync/tree/main/docs/providers/drawio)
