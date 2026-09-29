@@ -4,6 +4,41 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [3.7.0] — 2026-09-28
+
+### Changed
+
+- **`diagram-sync` now exits with code 1 when any diagram fails to render.** This includes syntax errors, a missing provider tool, a `--files` path that doesn't exist, and an explicitly requested format the provider doesn't support. Previously it always exited 0, so CI jobs stayed green on failure. Pipelines that were passing with a broken diagram will now fail.
+- **PlantUML output is always named after the source file.** A diagram starting with `@startuml <title>` used to be written to `<title>.<format>`, while the log reported `<source name>.<format>`. `docs/order flow.puml` with `@startuml Order Flow` now writes `diagrams/docs/order flow.svg`. If you had titled diagrams, delete the old title-named images from `diagrams/`. Files containing several `@startuml` blocks keep PlantUML's own names, and the log now lists each one.
+
+### Added
+
+- Warning when two sources would write the same output file, such as `architecture.puml` and `architecture.excalidraw` in one folder. Same-named sources that didn't change are checked too. Both are still rendered and the last one wins, so rename one of them.
+
+### CI
+
+- This repository's diagrams workflow builds diagram-sync from source instead of installing it from npm, so pull requests test their own code. It also runs when `src/` or the package files change.
+
+---
+
+## [3.6.1] — 2026-07-11
+
+### Fixed
+
+- `drawio.ts`: on headless Linux (no `DISPLAY`), `check()` ran `drawio --version`, which needs a display and fails, so Draw.io was reported as missing on CI runners even when installed. It now checks that the binary exists with `which drawio` instead, and keeps using `drawio --version` everywhere else
+
+### CI
+
+- Workflows use `GITHUB_TOKEN` with `contents: write` instead of requiring a `PAT_TOKEN` secret; a PAT is only needed to push through branch protection
+- `|| true` added after the changed-file `grep`, so a push or PR with no diagram changes no longer fails the step
+- Draw.io pinned to 30.3.6 in the repository workflow
+
+### Docs
+
+- `README.md` and `docs/workflow.yml`: CI example updated for the `GITHUB_TOKEN` setup and the `grep` fix
+
+---
+
 ## [3.6.0] — 2026-06-22
 
 ### Added

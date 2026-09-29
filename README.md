@@ -125,6 +125,12 @@ npx diagram-sync --changed
 
 ![demo-changed](https://raw.githubusercontent.com/Buffden/diagram-sync/main/docs/demo-changed.gif)
 
+#### Exit codes and output names
+
+`diagram-sync` exits with code 1 if any diagram fails to render, including a missing provider tool or a source file that doesn't exist, so CI jobs fail instead of passing silently.
+
+Each source `path/to/name.ext` is written to `diagrams/path/to/name.<format>`, whatever title the diagram declares (for example `@startuml My Title`). If two sources in one folder share a name, such as `architecture.puml` and `architecture.excalidraw`, they write the same file; diagram-sync warns about it, and you should rename one of them.
+
 ### 5. Config file
 
 Config is optional — no config file needed to get started. Add `diagram-sync.config.json` to your project root to control formats per provider or scope which providers run.

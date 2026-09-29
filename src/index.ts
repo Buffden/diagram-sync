@@ -29,7 +29,10 @@ program
 			: options.files
 				? options.files.map((f) => path.resolve(root, f))
 				: discoverFiles(root, config);
-		generateDiagrams(files, root, config, options.format);
+		const { failed } = generateDiagrams(files, root, config, options.format);
+		if (failed > 0) {
+			process.exitCode = 1;
+		}
 	});
 
 program.parse();

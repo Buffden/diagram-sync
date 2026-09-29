@@ -1,7 +1,7 @@
 name: Generate and Commit Diagrams
 
-# Remove path entries for providers you don't use.
-# The workflow only triggers when a matching source file changes.
+# Triggers when a diagram source or the diagram-sync code itself changes.
+# The reference copy for other projects lives in the README.
 on:
   pull_request:
     paths:
@@ -23,6 +23,11 @@ on:
       - '**/*.excalidraw'
       # BPMN — remove if not using .bpmn files
       - '**/*.bpmn'
+      # diagram-sync itself — re-run when the package code changes
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/diagrams.yml'
   push:
     branches: [main]
     paths:
@@ -44,6 +49,11 @@ on:
       - '**/*.excalidraw'
       # BPMN — remove if not using .bpmn files
       - '**/*.bpmn'
+      # diagram-sync itself — re-run when the package code changes
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/diagrams.yml'
   workflow_dispatch:
 
 # Keep in sync with the providers you use. Paths are NUL-separated end to end
@@ -106,8 +116,13 @@ jobs:
           npm install -g bpmn-to-image
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
-      - name: Install diagram-sync
-        run: npm install -g diagram-sync
+      # This repo builds diagram-sync from the checked-out source so each PR tests
+      # its own code. Projects using the package should `npm install -g diagram-sync`.
+      - name: Build diagram-sync from source
+        run: |
+          npm ci
+          npm run build
+          npm link
 
       - name: Generate changed diagrams
         env:
@@ -185,8 +200,13 @@ jobs:
           npm install -g bpmn-to-image
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
-      - name: Install diagram-sync
-        run: npm install -g diagram-sync
+      # This repo builds diagram-sync from the checked-out source so each PR tests
+      # its own code. Projects using the package should `npm install -g diagram-sync`.
+      - name: Build diagram-sync from source
+        run: |
+          npm ci
+          npm run build
+          npm link
 
       - name: Generate diagrams
         env:
