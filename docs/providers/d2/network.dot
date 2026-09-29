@@ -1,4 +1,4 @@
-// v2
+// v1
 digraph network {
-    client -> gateway -> service -> store
+    client -> gateway -> service
 }
