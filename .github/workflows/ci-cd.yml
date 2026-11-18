@@ -13,6 +13,9 @@ jobs:
     name: CI (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     if: github.event_name != 'release'
+    env:
+      # Job-level so the Sonar step's `if:` can test for it
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     strategy:
       fail-fast: false
@@ -22,6 +25,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          # Full history so SonarQube Cloud can blame lines and detect new code
+          fetch-depth: 0
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v7
@@ -48,6 +54,24 @@ jobs:
         continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache SonarQube packages
+        if: matrix.node-version == 20 && env.SONAR_TOKEN != ''
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      # Reuses coverage/lcov.info from the Coverage step. Skipped when SONAR_TOKEN
+      # is unavailable (fork and Dependabot PRs don't receive repo secrets).
+      - name: SonarQube Cloud scan
+        if: matrix.node-version == 20 && env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@e805d875275f728fac1885b413934be6d7c63f65 # v8.4.1
+        with:
+          # Fail this job when the quality gate fails, so it can block merges
+          args: >
+            -Dsonar.qualitygate.wait=true
 
   publish:
     name: Publish to npm
