@@ -55,32 +55,12 @@ describe('bpmnProvider.check', () => {
 });
 
 describe('bpmnProvider.generate', () => {
-	it('calls bpmn-to-image with file:output argument for svg', () => {
+	it.each(['svg', 'png', 'pdf'])('calls bpmn-to-image with file:output argument for %s', (format) => {
 		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		bpmnProvider.generate('/repo/process.bpmn', '/repo/diagrams', 'svg');
+		bpmnProvider.generate('/repo/process.bpmn', '/repo/diagrams', format);
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'bpmn-to-image',
-			['/repo/process.bpmn:/repo/diagrams/process.svg'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls bpmn-to-image with file:output argument for png', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		bpmnProvider.generate('/repo/process.bpmn', '/repo/diagrams', 'png');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'bpmn-to-image',
-			['/repo/process.bpmn:/repo/diagrams/process.png'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls bpmn-to-image with file:output argument for pdf', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		bpmnProvider.generate('/repo/process.bpmn', '/repo/diagrams', 'pdf');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'bpmn-to-image',
-			['/repo/process.bpmn:/repo/diagrams/process.pdf'],
+			[`/repo/process.bpmn:/repo/diagrams/process.${format}`],
 			expect.any(Object),
 		);
 	});

@@ -54,22 +54,12 @@ describe('d2Provider.check', () => {
 });
 
 describe('d2Provider.generate', () => {
-	it('calls d2 with input and output file for svg', () => {
+	it.each(['svg', 'png', 'pdf'])('calls d2 with input and output file for %s', (format) => {
 		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		d2Provider.generate('/repo/arch.d2', '/repo/diagrams', 'svg');
+		d2Provider.generate('/repo/arch.d2', '/repo/diagrams', format);
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'd2',
-			['/repo/arch.d2', '/repo/diagrams/arch.svg'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls d2 with input and output file for png', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		d2Provider.generate('/repo/arch.d2', '/repo/diagrams', 'png');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'd2',
-			['/repo/arch.d2', '/repo/diagrams/arch.png'],
+			['/repo/arch.d2', `/repo/diagrams/arch.${format}`],
 			expect.any(Object),
 		);
 	});
@@ -80,16 +70,6 @@ describe('d2Provider.generate', () => {
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'd2',
 			['/repo/system.d2', '/repo/diagrams/system.svg'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls d2 with input and output file for pdf', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		d2Provider.generate('/repo/arch.d2', '/repo/diagrams', 'pdf');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'd2',
-			['/repo/arch.d2', '/repo/diagrams/arch.pdf'],
 			expect.any(Object),
 		);
 	});
