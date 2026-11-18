@@ -17,6 +17,12 @@ updates:
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(dev-deps)
+    ignore:
+      # @types/node must match the lowest supported Node (engines.node), not the
+      # newest; newer majors type APIs that crash at runtime on older Node.
+      # Bump it by hand when engines.node is raised. Minor/patch still arrive.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       # One PR a week for routine dev tooling bumps instead of one per package.
       # Majors stay separate PRs so each breaking change gets its own review.
