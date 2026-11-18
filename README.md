@@ -6,6 +6,10 @@
 [![npm downloads](https://img.shields.io/npm/dt/diagram-sync)](https://www.npmjs.com/package/diagram-sync)
 [![license](https://img.shields.io/npm/l/diagram-sync)](./LICENSE)
 [![coverage](https://coveralls.io/repos/github/Buffden/diagram-sync/badge.svg?branch=main)](https://coveralls.io/github/Buffden/diagram-sync?branch=main)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Buffden_diagram-sync&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Buffden_diagram-sync)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Buffden_diagram-sync&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Buffden_diagram-sync)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Buffden_diagram-sync&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Buffden_diagram-sync)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Buffden_diagram-sync&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Buffden_diagram-sync)
 
 `diagram-sync` is a CLI tool that automatically generates images from diagram source files. Drop it into any repo and run `npx diagram-sync` — it finds every supported diagram file, renders it to an image, and mirrors the output under a `diagrams/` folder. No config required.
 
