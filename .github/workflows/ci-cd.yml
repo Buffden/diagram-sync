@@ -57,7 +57,7 @@ jobs:
 
       - name: Cache SonarQube packages
         if: matrix.node-version == 20 && env.SONAR_TOKEN != ''
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
