@@ -6,6 +6,11 @@ import { type DiagramProvider, type GenerateOptions } from './types';
 
 const DEFAULT_BACKGROUND = '#FFFFFF';
 
+function compareCodeUnits(a: string, b: string): number {
+	if (a < b) return -1;
+	return a > b ? 1 : 0;
+}
+
 const FORMAT_FLAGS: Record<string, string> = {
 	png: '-tpng',
 	svg: '-tsvg',
@@ -51,7 +56,11 @@ export const plantumlProvider: DiagramProvider = {
 				throw new Error(result.stderr || result.error?.message || 'plantuml render failed');
 			}
 
-			const produced = fs.readdirSync(tmpDir).filter((f) => f.endsWith('.' + format)).sort();
+			// Code-unit order, not localeCompare: keeps PlantUML's numbering
+			// (flow.svg, flow_001.svg, ...) in diagram order on every machine/locale.
+			const produced = fs.readdirSync(tmpDir)
+				.filter((f) => f.endsWith('.' + format))
+				.sort(compareCodeUnits);
 			if (produced.length === 0) {
 				throw new Error(`plantuml produced no .${format} output`);
 			}
