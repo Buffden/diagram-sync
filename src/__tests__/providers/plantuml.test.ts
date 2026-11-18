@@ -127,6 +127,15 @@ describe('plantumlProvider.generate', () => {
 		expect(written).toEqual([path.join(outDir, 'flow.svg'), path.join(outDir, 'flow_001.svg')]);
 	});
 
+	it('returns several diagrams in plantuml numbering order, independent of locale', () => {
+		// localeCompare would put "flow_001" before "flow" ('_' collates before '.')
+		renders('flow_002.svg', 'Flow_B.svg', 'flow.svg', 'flow_001.svg');
+		const written = plantumlProvider.generate('/repo/flow.puml', outDir, 'svg');
+		expect(written).toEqual(
+			['Flow_B.svg', 'flow.svg', 'flow_001.svg', 'flow_002.svg'].map((f) => path.join(outDir, f)),
+		);
+	});
+
 	it('throws when plantuml writes no output', () => {
 		renders();
 		expect(() => plantumlProvider.generate('/repo/flow.puml', outDir, 'svg')).toThrow(/no \.svg output/);

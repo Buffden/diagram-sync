@@ -7,8 +7,7 @@ import { type DiagramProvider, type GenerateOptions } from './types';
 const DEFAULT_BACKGROUND = '#FFFFFF';
 
 function compareCodeUnits(a: string, b: string): number {
-	if (a < b) return -1;
-	return a > b ? 1 : 0;
+	return Number(a > b) - Number(a < b);
 }
 
 const FORMAT_FLAGS: Record<string, string> = {
