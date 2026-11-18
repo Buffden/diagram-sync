@@ -73,10 +73,11 @@ jobs:
           # Full history required so git diff can resolve the base ref.
           fetch-depth: 0
 
+      # Node 22: mermaid-cli 12 requires >=22.13 (excalidraw-cli >=20.19).
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
 
       # --- PlantUML — remove if not using .puml / .plantuml files ---
       # Graphviz is needed for every PlantUML diagram type except sequence diagrams.
@@ -86,8 +87,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       # --- Mermaid — remove if not using .mmd / .mermaid files ---
+      # Pinned version. Install scripts must run: Puppeteer's postinstall downloads
+      # the headless Chrome that mermaid-cli renders with.
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli@12.2.0
 
       # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
       - name: Install Graphviz
@@ -125,20 +128,23 @@ jobs:
           d2 --version
 
       # --- Excalidraw — remove if not using .excalidraw files ---
+      # Pinned version; --ignore-scripts because no dependency needs an install hook.
       - name: Install Excalidraw CLI
-        run: npm install -g @swiftlysingh/excalidraw-cli
+        run: npm install -g --ignore-scripts @swiftlysingh/excalidraw-cli@1.5.0
 
       # --- BPMN — remove if not using .bpmn files ---
       - name: Install BPMN CLI
         run: |
-          npm install -g bpmn-to-image
+          # Pinned version. Install scripts must run: Puppeteer's postinstall
+          # downloads the headless Chrome that bpmn-to-image renders with.
+          npm install -g bpmn-to-image@0.10.0
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
       # This repo builds diagram-sync from the checked-out source so each PR tests
       # its own code. Projects using the package should `npm install -g diagram-sync`.
       - name: Build diagram-sync from source
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm run build
           npm link
 
@@ -178,10 +184,11 @@ jobs:
           # Full history required so git diff can resolve the previous commit.
           fetch-depth: 0
 
+      # Node 22: mermaid-cli 12 requires >=22.13 (excalidraw-cli >=20.19).
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
 
       # --- PlantUML — remove if not using .puml / .plantuml files ---
       # Graphviz is needed for every PlantUML diagram type except sequence diagrams.
@@ -191,8 +198,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       # --- Mermaid — remove if not using .mmd / .mermaid files ---
+      # Pinned version. Install scripts must run: Puppeteer's postinstall downloads
+      # the headless Chrome that mermaid-cli renders with.
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli@12.2.0
 
       # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
       - name: Install Graphviz
@@ -230,20 +239,23 @@ jobs:
           d2 --version
 
       # --- Excalidraw — remove if not using .excalidraw files ---
+      # Pinned version; --ignore-scripts because no dependency needs an install hook.
       - name: Install Excalidraw CLI
-        run: npm install -g @swiftlysingh/excalidraw-cli
+        run: npm install -g --ignore-scripts @swiftlysingh/excalidraw-cli@1.5.0
 
       # --- BPMN — remove if not using .bpmn files ---
       - name: Install BPMN CLI
         run: |
-          npm install -g bpmn-to-image
+          # Pinned version. Install scripts must run: Puppeteer's postinstall
+          # downloads the headless Chrome that bpmn-to-image renders with.
+          npm install -g bpmn-to-image@0.10.0
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
       # This repo builds diagram-sync from the checked-out source so each PR tests
       # its own code. Projects using the package should `npm install -g diagram-sync`.
       - name: Build diagram-sync from source
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm run build
           npm link
 
