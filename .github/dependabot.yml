@@ -23,6 +23,10 @@ updates:
       # Bump it by hand when engines.node is raised. Minor/patch still arrive.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # commander 15 is ESM-only and requires Node >=22.12; we support Node >=20
+      # and emit CommonJS. Remove when engines.node is raised (diagram-sync 4.0).
+      - dependency-name: "commander"
+        versions: [">=15"]
     groups:
       # One PR a week for routine dev tooling bumps instead of one per package.
       # Majors stay separate PRs so each breaking change gets its own review.
