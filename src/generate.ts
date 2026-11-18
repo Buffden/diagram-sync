@@ -48,19 +48,8 @@ function warnOnOutputClashes(files: string[], root: string, config: Config, cliF
 
 	const sources = new Set(files);
 	for (const file of files) {
-		const dir = path.dirname(file);
-		const stem = path.basename(file, path.extname(file));
-		let entries: string[];
-		try {
-			entries = fs.readdirSync(dir);
-		} catch {
-			continue;
-		}
-		for (const entry of entries) {
-			const ext = path.extname(entry);
-			if (activeExtensions.has(ext) && path.basename(entry, ext) === stem) {
-				sources.add(path.join(dir, entry));
-			}
+		for (const sibling of sameNamedSiblings(file, activeExtensions)) {
+			sources.add(sibling);
 		}
 	}
 
@@ -76,12 +65,35 @@ function warnOnOutputClashes(files: string[], root: string, config: Config, cliF
 
 	for (const [out, clashing] of byOutput) {
 		if (clashing.length > 1) {
-			log.warn(
-				`Output clash: ${clashing.map((f) => path.relative(root, f)).join(' and ')} ${clashing.length === 2 ? 'both' : 'all'} write ` +
-				`${path.relative(root, out)}; the last one rendered wins. Rename one of the sources.`,
-			);
+			warnClash(out, clashing, root);
 		}
 	}
+}
+
+/** Files next to `file` with the same stem and an active diagram extension. */
+function sameNamedSiblings(file: string, activeExtensions: Set<string>): string[] {
+	const dir = path.dirname(file);
+	const stem = path.basename(file, path.extname(file));
+	let entries: string[];
+	try {
+		entries = fs.readdirSync(dir);
+	} catch {
+		return [];
+	}
+	return entries
+		.filter((entry) => {
+			const ext = path.extname(entry);
+			return activeExtensions.has(ext) && path.basename(entry, ext) === stem;
+		})
+		.map((entry) => path.join(dir, entry));
+}
+
+function warnClash(out: string, clashing: string[], root: string): void {
+	const quantifier = clashing.length === 2 ? 'both' : 'all';
+	log.warn(
+		`Output clash: ${clashing.map((f) => path.relative(root, f)).join(' and ')} ${quantifier} write ` +
+		`${path.relative(root, out)}; the last one rendered wins. Rename one of the sources.`,
+	);
 }
 
 export function generateDiagrams(files: string[], root: string, config: Config, cliFormat?: string): GenerateResult {
@@ -92,72 +104,83 @@ export function generateDiagrams(files: string[], root: string, config: Config, 
 
 	log.info(`Found ${files.length} diagram file(s). Generating images...`);
 
-	const availableProviders = new Set<DiagramProvider>();
-	const unavailableProviders = new Set<DiagramProvider>();
-
-	function isAvailable(provider: DiagramProvider): boolean {
-		if (availableProviders.has(provider)) return true;
-		if (unavailableProviders.has(provider)) return false;
-		const check = provider.check();
-		if (!check.available) {
-			log.warn(check.message ?? `${provider.name} is not available. Skipping ${provider.name} files.`);
-			unavailableProviders.add(provider);
-			return false;
-		}
-		availableProviders.add(provider);
-		return true;
-	}
-
+	const isAvailable = createAvailabilityCheck();
 	warnOnOutputClashes(files, root, config, cliFormat);
 
 	let success = 0;
 	let failed = 0;
 
 	for (const file of files) {
-		const ext = path.extname(file);
-		const provider = getProvider(ext);
-		const relative = path.relative(root, file);
-
-		if (!provider) {
-			log.warn(`No provider registered for ${ext}, skipping: ${relative}`);
-			continue;
-		}
-
-		if (!isAvailable(provider)) {
-			failed++;
-			continue;
-		}
-
-		const job = getJob(config, provider.name);
-		const choice = chooseFormat(provider, config, cliFormat);
-		if (!choice.ok) {
-			log.error(`Failed: ${relative}`);
-			console.error(`${provider.name} does not support format "${choice.requested}". Supported: ${provider.supportedFormats.join(', ')}`);
-			failed++;
-			continue;
-		}
-		if (choice.fellBack) {
-			log.warn(`${provider.name} does not support "${choice.requested}", using "${choice.format}" instead`);
-		}
-		const { format } = choice;
-
-		const outputDir = path.join(root, 'diagrams', path.dirname(relative));
-		fs.mkdirSync(outputDir, { recursive: true });
-
-		try {
-			const written = provider.generate(file, outputDir, format, { background: job?.background }) || [outputPath(file, root, format)];
-			for (const out of written) {
-				log.success(`Generated: ${path.relative(root, out)}`);
-			}
-			success++;
-		} catch (err) {
-			log.error(`Failed: ${relative}`);
-			if (err instanceof Error) console.error(err.message);
-			failed++;
-		}
+		const outcome = generateOne(file, root, config, isAvailable, cliFormat);
+		if (outcome === 'success') success++;
+		else if (outcome === 'failed') failed++;
 	}
 
 	console.log('');
 	log.info(`Done. ${success} generated, ${failed} failed.`);
 	return { success, failed };
+}
+
+/** Runs each provider's check() once per run and remembers the result. */
+function createAvailabilityCheck(): (provider: DiagramProvider) => boolean {
+	const known = new Map<DiagramProvider, boolean>();
+	return (provider) => {
+		const cached = known.get(provider);
+		if (cached !== undefined) return cached;
+		const check = provider.check();
+		if (!check.available) {
+			log.warn(check.message ?? `${provider.name} is not available. Skipping ${provider.name} files.`);
+		}
+		known.set(provider, check.available);
+		return check.available;
+	};
+}
+
+type Outcome = 'success' | 'failed' | 'skipped';
+
+function generateOne(
+	file: string,
+	root: string,
+	config: Config,
+	isAvailable: (provider: DiagramProvider) => boolean,
+	cliFormat?: string,
+): Outcome {
+	const ext = path.extname(file);
+	const provider = getProvider(ext);
+	const relative = path.relative(root, file);
+
+	if (!provider) {
+		log.warn(`No provider registered for ${ext}, skipping: ${relative}`);
+		return 'skipped';
+	}
+	if (!isAvailable(provider)) {
+		return 'failed';
+	}
+
+	const choice = chooseFormat(provider, config, cliFormat);
+	if (!choice.ok) {
+		log.error(`Failed: ${relative}`);
+		console.error(`${provider.name} does not support format "${choice.requested}". Supported: ${provider.supportedFormats.join(', ')}`);
+		return 'failed';
+	}
+	if (choice.fellBack) {
+		log.warn(`${provider.name} does not support "${choice.requested}", using "${choice.format}" instead`);
+	}
+	const { format } = choice;
+
+	const outputDir = path.join(root, 'diagrams', path.dirname(relative));
+	fs.mkdirSync(outputDir, { recursive: true });
+
+	try {
+		const background = getJob(config, provider.name)?.background;
+		const written = provider.generate(file, outputDir, format, { background }) ?? [outputPath(file, root, format)];
+		for (const out of written) {
+			log.success(`Generated: ${path.relative(root, out)}`);
+		}
+		return 'success';
+	} catch (err) {
+		log.error(`Failed: ${relative}`);
+		if (err instanceof Error) console.error(err.message);
+		return 'failed';
+	}
 }

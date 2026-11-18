@@ -57,32 +57,12 @@ describe('mermaidProvider.check', () => {
 });
 
 describe('mermaidProvider.generate', () => {
-	it('calls mmdc with correct output path for png', () => {
+	it.each(['png', 'svg', 'pdf'])('calls mmdc with correct output path for %s', (format) => {
 		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		mermaidProvider.generate('/repo/flow.mmd', '/repo/diagrams', 'png');
+		mermaidProvider.generate('/repo/flow.mmd', '/repo/diagrams', format);
 		expect(mockSpawnSync).toHaveBeenCalledWith(
 			'mmdc',
-			['-i', '/repo/flow.mmd', '-o', '/repo/diagrams/flow.png'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls mmdc with correct output path for svg', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		mermaidProvider.generate('/repo/flow.mmd', '/repo/diagrams', 'svg');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'mmdc',
-			['-i', '/repo/flow.mmd', '-o', '/repo/diagrams/flow.svg'],
-			expect.any(Object),
-		);
-	});
-
-	it('calls mmdc with correct output path for pdf', () => {
-		mockSpawnSync.mockReturnValue({ status: 0 } as any);
-		mermaidProvider.generate('/repo/flow.mmd', '/repo/diagrams', 'pdf');
-		expect(mockSpawnSync).toHaveBeenCalledWith(
-			'mmdc',
-			['-i', '/repo/flow.mmd', '-o', '/repo/diagrams/flow.pdf'],
+			['-i', '/repo/flow.mmd', '-o', `/repo/diagrams/flow.${format}`],
 			expect.any(Object),
 		);
 	});

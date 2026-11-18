@@ -2,11 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { allProviderNames } from './providers';
 
-export type ProviderType = string;
-
 export interface Job {
 	name: string;
-	type: ProviderType;
+	/** Provider name, e.g. 'plantuml' or 'mermaid'. */
+	type: string;
 	format?: string;
 	background?: string;
 }

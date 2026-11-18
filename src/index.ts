@@ -24,11 +24,14 @@ program
 		const root = process.cwd();
 		const explicitConfig = process.argv.some((a) => a === '--config' || a.startsWith('--config=') || a === '-c');
 		const config = loadConfig(options.config, explicitConfig);
-		const files = options.changed
-			? discoverChangedFiles(root, config)
-			: options.files
-				? options.files.map((f) => path.resolve(root, f))
-				: discoverFiles(root, config);
+		let files: string[];
+		if (options.changed) {
+			files = discoverChangedFiles(root, config);
+		} else if (options.files) {
+			files = options.files.map((f) => path.resolve(root, f));
+		} else {
+			files = discoverFiles(root, config);
+		}
 		const { failed } = generateDiagrams(files, root, config, options.format);
 		if (failed > 0) {
 			process.exitCode = 1;
