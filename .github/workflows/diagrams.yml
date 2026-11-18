@@ -87,10 +87,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       # --- Mermaid — remove if not using .mmd / .mermaid files ---
-      # Pinned version. Install scripts must run: Puppeteer's postinstall downloads
-      # the headless Chrome that mermaid-cli renders with.
+      # Pinned version, installed with --ignore-scripts so no dependency hook runs.
+      # Then only Puppeteer's own postinstall runs, to download the headless Chrome
+      # that mermaid-cli renders with.
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli@12.2.0
+        run: |
+          npm install -g --ignore-scripts @mermaid-js/mermaid-cli@12.2.0
+          (cd "$(npm root -g)/@mermaid-js/mermaid-cli/node_modules/puppeteer" && node install.mjs)
 
       # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
       - name: Install Graphviz
@@ -135,9 +138,11 @@ jobs:
       # --- BPMN — remove if not using .bpmn files ---
       - name: Install BPMN CLI
         run: |
-          # Pinned version. Install scripts must run: Puppeteer's postinstall
-          # downloads the headless Chrome that bpmn-to-image renders with.
-          npm install -g bpmn-to-image@0.10.0
+          # Pinned version, installed with --ignore-scripts so no dependency hook
+          # runs. Then only Puppeteer's own postinstall runs, to download the
+          # headless Chrome that bpmn-to-image renders with.
+          npm install -g --ignore-scripts bpmn-to-image@0.10.0
+          (cd "$(npm root -g)/bpmn-to-image/node_modules/puppeteer" && node install.mjs)
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
       # This repo builds diagram-sync from the checked-out source so each PR tests
@@ -198,10 +203,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
       # --- Mermaid — remove if not using .mmd / .mermaid files ---
-      # Pinned version. Install scripts must run: Puppeteer's postinstall downloads
-      # the headless Chrome that mermaid-cli renders with.
+      # Pinned version, installed with --ignore-scripts so no dependency hook runs.
+      # Then only Puppeteer's own postinstall runs, to download the headless Chrome
+      # that mermaid-cli renders with.
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli@12.2.0
+        run: |
+          npm install -g --ignore-scripts @mermaid-js/mermaid-cli@12.2.0
+          (cd "$(npm root -g)/@mermaid-js/mermaid-cli/node_modules/puppeteer" && node install.mjs)
 
       # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
       - name: Install Graphviz
@@ -246,9 +254,11 @@ jobs:
       # --- BPMN — remove if not using .bpmn files ---
       - name: Install BPMN CLI
         run: |
-          # Pinned version. Install scripts must run: Puppeteer's postinstall
-          # downloads the headless Chrome that bpmn-to-image renders with.
-          npm install -g bpmn-to-image@0.10.0
+          # Pinned version, installed with --ignore-scripts so no dependency hook
+          # runs. Then only Puppeteer's own postinstall runs, to download the
+          # headless Chrome that bpmn-to-image renders with.
+          npm install -g --ignore-scripts bpmn-to-image@0.10.0
+          (cd "$(npm root -g)/bpmn-to-image/node_modules/puppeteer" && node install.mjs)
           sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
 
       # This repo builds diagram-sync from the checked-out source so each PR tests
