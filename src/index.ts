@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
 import { Command } from 'commander';
 import { loadConfig } from './config';
 import { discoverFiles, discoverChangedFiles } from './discover';

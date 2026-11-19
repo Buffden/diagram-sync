@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import { spawnSync } from 'child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
-vi.mock('child_process');
+vi.mock('node:child_process');
 
 import { discoverFiles, discoverChangedFiles } from '../discover';
 import { type Config } from '../config';

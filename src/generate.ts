@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { log } from './logger';
 import { allExtensions, getProvider } from './providers';
 import { type Config, type Job, resolveFormat } from './config';

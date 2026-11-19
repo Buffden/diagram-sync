@@ -1,6 +1,6 @@
-import { spawnSync } from 'child_process';
+import { spawnSync } from 'node:child_process';
 import { type DiagramProvider } from './types';
-import path from 'path';
+import path from 'node:path';
 
 export const drawioProvider: DiagramProvider = {
 	name: 'drawio',
