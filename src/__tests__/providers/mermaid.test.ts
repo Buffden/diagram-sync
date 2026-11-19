@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { spawnSync } from 'child_process';
+import { spawnSync } from 'node:child_process';
 
-vi.mock('child_process');
-vi.mock('fs');
+vi.mock('node:child_process');
+vi.mock('node:fs');
 
 import { mermaidProvider } from '../../providers/mermaid';
 

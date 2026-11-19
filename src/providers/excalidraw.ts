@@ -1,7 +1,7 @@
-import { spawnSync } from 'child_process';
-import { existsSync } from 'fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { type DiagramProvider } from './types';
-import path from 'path';
+import path from 'node:path';
 
 let cachedBin: string | undefined;
 

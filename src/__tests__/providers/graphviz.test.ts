@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { spawnSync } from 'child_process';
+import { spawnSync } from 'node:child_process';
 
-vi.mock('child_process');
+vi.mock('node:child_process');
 
 import { graphvizProvider } from '../../providers/graphviz';
 
