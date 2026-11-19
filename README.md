@@ -184,223 +184,232 @@ Format resolution order: `--format` flag → job `format` → global `format` �
 
 Generates a preview on every PR and commits images to `main` on merge.
 
-**Remove the install steps and path filters for providers you don't use** — most teams only need 1–2.
+Copy the workflow below to `.github/workflows/diagrams.yml` as-is. It works out which diagrams changed and **installs only the renderers those diagrams need**, so a PR that touches one `.mmd` file installs only Mermaid. Each provider's install step is a self-contained `── <Provider>` block, so you can delete the ones you'll never use. Manual runs (`workflow_dispatch`) re-render every diagram.
 
 ```yaml
-name: Generate and Commit Diagrams
+name: Diagrams
 
-# Remove path entries for providers you don't use.
-# The workflow only triggers when a matching source file changes.
+# Renders diagram sources to images with diagram-sync:
+#   - pull requests: renders the changed diagrams and uploads them as a preview artifact
+#   - pushes to main: renders the changed diagrams and commits them to diagrams/
+#   - manual run:     renders every diagram and commits the result
+#
+# Copy this file to .github/workflows/diagrams.yml as-is. Each renderer below is
+# installed only when a diagram of that type is being rendered, so providers you
+# don't use cost nothing. To trim the file anyway, delete the "── <Provider>"
+# blocks you'll never need; every block is self-contained.
+
 on:
   pull_request:
+    # Keep this list the same as the push paths below.
     paths:
-      # PlantUML — remove if not using .puml / .plantuml files
-      - '**/*.puml'
-      - '**/*.plantuml'
-      # Mermaid — remove if not using .mmd / .mermaid files
-      - '**/*.mmd'
-      - '**/*.mermaid'
-      # Graphviz — remove if not using .dot / .gv files
-      - '**/*.dot'
-      - '**/*.gv'
-      # Draw.io — remove if not using .drawio / .dio files
-      - '**/*.drawio'
-      - '**/*.dio'
-      # D2 — remove if not using .d2 files
-      - '**/*.d2'
-      # Excalidraw — remove if not using .excalidraw files
-      - '**/*.excalidraw'
-      # BPMN — remove if not using .bpmn files
-      - '**/*.bpmn'
+      - '**/*.puml'        # PlantUML
+      - '**/*.plantuml'    # PlantUML
+      - '**/*.mmd'         # Mermaid
+      - '**/*.mermaid'     # Mermaid
+      - '**/*.dot'         # Graphviz
+      - '**/*.gv'          # Graphviz
+      - '**/*.drawio'      # Draw.io
+      - '**/*.dio'         # Draw.io
+      - '**/*.d2'          # D2
+      - '**/*.excalidraw'  # Excalidraw
+      - '**/*.bpmn'        # BPMN
   push:
     branches: [main]
     paths:
-      # PlantUML — remove if not using .puml / .plantuml files
-      - '**/*.puml'
-      - '**/*.plantuml'
-      # Mermaid — remove if not using .mmd / .mermaid files
-      - '**/*.mmd'
-      - '**/*.mermaid'
-      # Graphviz — remove if not using .dot / .gv files
-      - '**/*.dot'
-      - '**/*.gv'
-      # Draw.io — remove if not using .drawio / .dio files
-      - '**/*.drawio'
-      - '**/*.dio'
-      # D2 — remove if not using .d2 files
-      - '**/*.d2'
-      # Excalidraw — remove if not using .excalidraw files
-      - '**/*.excalidraw'
-      # BPMN — remove if not using .bpmn files
-      - '**/*.bpmn'
+      - '**/*.puml'        # PlantUML
+      - '**/*.plantuml'    # PlantUML
+      - '**/*.mmd'         # Mermaid
+      - '**/*.mermaid'     # Mermaid
+      - '**/*.dot'         # Graphviz
+      - '**/*.gv'          # Graphviz
+      - '**/*.drawio'      # Draw.io
+      - '**/*.dio'         # Draw.io
+      - '**/*.d2'          # D2
+      - '**/*.excalidraw'  # Excalidraw
+      - '**/*.bpmn'        # BPMN
   workflow_dispatch:
 
-# Keep in sync with the providers you use. Paths are NUL-separated end to end
-# (git diff -z | grep -z | xargs -0) so file names with spaces survive.
-env:
-  DIAGRAM_PATTERN: '\.(puml|plantuml|mmd|mermaid|dot|gv|drawio|dio|d2|excalidraw|bpmn)$'
-
 jobs:
-  preview:
-    name: Generate Preview
+  diagrams:
+    name: Generate diagrams
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          # Full history required so git diff can resolve the base ref.
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: '20'
-
-      # --- PlantUML — remove if not using .puml / .plantuml files ---
-      # Graphviz is needed for every PlantUML diagram type except sequence diagrams.
-      - name: Install PlantUML and Graphviz
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
-
-      # --- Mermaid — remove if not using .mmd / .mermaid files ---
-      - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli
-
-      # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
-      - name: Install Graphviz
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y graphviz
-
-      # --- Draw.io — remove if not using .drawio / .dio files ---
-      - name: Install Draw.io
-        run: |
-          DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
-          wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
-          sudo apt-get install -y ./drawio.deb xvfb
-
-      # --- D2 — remove if not using .d2 files ---
-      - name: Install D2
-        run: curl -fsSL https://d2lang.com/install.sh | sh
-
-      # --- Excalidraw — remove if not using .excalidraw files ---
-      - name: Install Excalidraw CLI
-        run: npm install -g @swiftlysingh/excalidraw-cli
-
-      # --- BPMN — remove if not using .bpmn files ---
-      - name: Install BPMN CLI
-        run: |
-          npm install -g bpmn-to-image
-          sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
-
-      - name: Install diagram-sync
-        run: npm install -g diagram-sync
-
-      - name: Generate changed diagrams
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: |
-          git diff -z --name-only --diff-filter=d "origin/${BASE_REF}...HEAD" \
-            | { grep -zE "$DIAGRAM_PATTERN" || echo "No diagram files changed." >&2; } \
-            | xargs -0 -r diagram-sync --files
-        # add --format png or --format pdf after --files to override the default svg output
-
-      # !cancelled() so previews of the diagrams that did render are still
-      # uploaded when another one fails
-      - name: Upload diagram previews
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: diagrams-preview
-          path: diagrams/
-          if-no-files-found: ignore
-
-  commit:
-    name: Generate and Commit
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     permissions:
-      contents: write
+      contents: write  # to commit rendered images on push / manual runs
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # GITHUB_TOKEN with contents: write is enough when main is unprotected.
           # If a branch ruleset blocks pushes from GITHUB_TOKEN, save a fine-grained PAT
           # (Contents: read+write) as PAT_TOKEN; it is used automatically when present.
           token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-          # Full history required so git diff can resolve the previous commit.
+          # Full history so git diff can resolve the base / previous commit.
           fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v5
+      # Node 22: mermaid-cli 12 requires >=22.13 (excalidraw-cli >=20.19).
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
 
-      # --- PlantUML — remove if not using .puml / .plantuml files ---
+      # Works out which diagrams to render and which providers they need. Sets one
+      # output per provider (plantuml=true, ...) that the install steps check.
+      # Paths are NUL-separated end to end so file names with spaces survive.
+      - name: Find diagrams to render
+        id: find
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          declare -A EXTENSIONS=(
+            [plantuml]='puml|plantuml'
+            [mermaid]='mmd|mermaid'
+            [graphviz]='dot|gv'
+            [drawio]='drawio|dio'
+            [d2]='d2'
+            [excalidraw]='excalidraw'
+            [bpmn]='bpmn'
+          )
+          pattern="\.($(IFS='|'; echo "${EXTENSIONS[*]}"))$"
+          candidates="$RUNNER_TEMP/candidates"
+          list="$RUNNER_TEMP/diagrams.list"
+
+          # Render everything on manual runs and on the first push of a branch
+          # (no previous commit to diff against); otherwise only what changed.
+          mode=changed
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            git diff -z --name-only --diff-filter=d "origin/${BASE_REF}...HEAD" > "$candidates"
+          elif [ "$EVENT_NAME" = "push" ] && [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            git diff -z --name-only --diff-filter=d "$BEFORE_SHA" "$AFTER_SHA" > "$candidates"
+          else
+            mode=all
+            git ls-files -z > "$candidates"
+          fi
+
+          grep -zE "$pattern" "$candidates" > "$list" || true
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          if [ ! -s "$list" ]; then
+            echo "No diagram files to render."
+            exit 0
+          fi
+          echo "any=true" >> "$GITHUB_OUTPUT"
+          echo "Diagrams to render ($mode):"
+          tr '\0' '\n' < "$list"
+          for provider in "${!EXTENSIONS[@]}"; do
+            if grep -qzE "\.(${EXTENSIONS[$provider]})$" "$list"; then
+              echo "$provider=true" >> "$GITHUB_OUTPUT"
+            fi
+          done
+
+      # ── PlantUML (.puml, .plantuml) ──────────────────────────────────────────
       # Graphviz is needed for every PlantUML diagram type except sequence diagrams.
-      - name: Install PlantUML and Graphviz
+      - name: Install PlantUML
+        if: steps.find.outputs.plantuml == 'true'
         run: |
           sudo apt-get update -q
           sudo apt-get install -y --no-install-recommends default-jre-headless plantuml graphviz
 
-      # --- Mermaid — remove if not using .mmd / .mermaid files ---
+      # ── Mermaid (.mmd, .mermaid) ─────────────────────────────────────────────
+      # Pinned version, installed with --ignore-scripts so no dependency hook runs.
+      # Then only Puppeteer's own postinstall runs, to download the headless Chrome
+      # that mermaid-cli renders with.
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli
+        if: steps.find.outputs.mermaid == 'true'
+        run: |
+          npm install -g --ignore-scripts @mermaid-js/mermaid-cli@12.2.0
+          (cd "$(npm root -g)/@mermaid-js/mermaid-cli/node_modules/puppeteer" && node install.mjs)
 
-      # --- Graphviz — remove if not using .dot / .gv files (already installed above if using PlantUML) ---
+      # ── Graphviz (.dot, .gv) ─────────────────────────────────────────────────
       - name: Install Graphviz
+        if: steps.find.outputs.graphviz == 'true'
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y graphviz
+          sudo apt-get install -y --no-install-recommends graphviz
 
-      # --- Draw.io — remove if not using .drawio / .dio files ---
+      # ── Draw.io (.drawio, .dio) ──────────────────────────────────────────────
+      # Pinned version + SHA-256 (from the release's Files-SHA256-Hashes.txt).
+      # When bumping DRAWIO_VERSION, update DRAWIO_SHA256 to match. xvfb gives
+      # draw.io a virtual display; diagram-sync uses xvfb-run automatically.
       - name: Install Draw.io
+        if: steps.find.outputs.drawio == 'true'
+        env:
+          DRAWIO_VERSION: '30.3.6'
+          DRAWIO_SHA256: '4df35ffe4cd7b2652771d9e55fc4e0ad4fb7bf55fbfab303da7c86b83af2dd82'
         run: |
-          DRAWIO_VERSION=$(curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | jq -r '.tag_name | ltrimstr("v")')
-          wget -q "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -O drawio.deb
-          sudo apt-get install -y ./drawio.deb xvfb
+          curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 -o "$RUNNER_TEMP/drawio.deb" \
+            "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb"
+          echo "${DRAWIO_SHA256}  $RUNNER_TEMP/drawio.deb" | sha256sum -c -
+          sudo apt-get update -q
+          sudo apt-get install -y "$RUNNER_TEMP/drawio.deb" xvfb
 
-      # --- D2 — remove if not using .d2 files ---
+      # ── D2 (.d2) ─────────────────────────────────────────────────────────────
+      # Pinned release tarball + SHA-256 instead of `curl install.sh | sh`: nothing
+      # unverified is executed, and no GitHub API call (which is rate-limited).
+      # When bumping D2_VERSION, update D2_SHA256 to match.
       - name: Install D2
-        run: curl -fsSL https://d2lang.com/install.sh | sh
-
-      # --- Excalidraw — remove if not using .excalidraw files ---
-      - name: Install Excalidraw CLI
-        run: npm install -g @swiftlysingh/excalidraw-cli
-
-      # --- BPMN — remove if not using .bpmn files ---
-      - name: Install BPMN CLI
+        if: steps.find.outputs.d2 == 'true'
+        env:
+          D2_VERSION: '0.9.0'
+          D2_SHA256: '5669ddc46b99e942cc96078f4a4e36d5e62103348f4c05179ede27802fdd87a9'
         run: |
-          npm install -g bpmn-to-image
-          sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" $(npm root -g)/bpmn-to-image/index.js
+          curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 -o "$RUNNER_TEMP/d2.tar.gz" \
+            "https://github.com/terrastruct/d2/releases/download/v${D2_VERSION}/d2-v${D2_VERSION}-linux-amd64.tar.gz"
+          echo "${D2_SHA256}  $RUNNER_TEMP/d2.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/d2.tar.gz" -C "$RUNNER_TEMP"
+          sudo install -m 0755 "$RUNNER_TEMP/d2-v${D2_VERSION}/bin/d2" /usr/local/bin/d2
+          d2 --version
+
+      # ── Excalidraw (.excalidraw) ─────────────────────────────────────────────
+      # Pinned version; --ignore-scripts because no dependency needs an install hook.
+      - name: Install Excalidraw CLI
+        if: steps.find.outputs.excalidraw == 'true'
+        run: npm install -g --ignore-scripts @swiftlysingh/excalidraw-cli@1.5.0
+
+      # ── BPMN (.bpmn) ─────────────────────────────────────────────────────────
+      # Pinned version, installed with --ignore-scripts so no dependency hook runs.
+      # Then only Puppeteer's own postinstall runs, to download the headless Chrome
+      # that bpmn-to-image renders with. The sed patch lets Chrome run as root on CI.
+      - name: Install BPMN CLI
+        if: steps.find.outputs.bpmn == 'true'
+        run: |
+          npm install -g --ignore-scripts bpmn-to-image@0.10.0
+          (cd "$(npm root -g)/bpmn-to-image/node_modules/puppeteer" && node install.mjs)
+          sed -i "s/headless: 'new'/headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']/" "$(npm root -g)/bpmn-to-image/index.js"
+
+      # ─────────────────────────────────────────────────────────────────────────
 
       - name: Install diagram-sync
-        run: npm install -g diagram-sync
+        if: steps.find.outputs.any == 'true'
+        run: npm install -g --ignore-scripts diagram-sync@3
 
       # continue-on-error so one broken diagram doesn't stop the others from being
-      # committed. The last step still fails the job if anything failed here.
+      # previewed / committed. The last step still fails the job if this failed.
+      # Add --format png or --format pdf to override the default svg output.
       - name: Generate diagrams
-        id: generate
+        id: render
+        if: steps.find.outputs.any == 'true'
         continue-on-error: true
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          BEFORE_SHA: ${{ github.event.before }}
-          AFTER_SHA: ${{ github.sha }}
+          MODE: ${{ steps.find.outputs.mode }}
         run: |
-          # Regenerate everything on manual runs, or when there is no previous
-          # commit to diff against (first push / new branch).
-          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+          if [ "$MODE" = "all" ]; then
             diagram-sync
           else
-            git diff -z --name-only --diff-filter=d "$BEFORE_SHA" "$AFTER_SHA" \
-              | { grep -zE "$DIAGRAM_PATTERN" || echo "No diagram files changed." >&2; } \
-              | xargs -0 -r diagram-sync --files
+            xargs -0 -r diagram-sync --files < "$RUNNER_TEMP/diagrams.list"
           fi
 
+      - name: Upload diagram previews
+        if: github.event_name == 'pull_request' && steps.find.outputs.any == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: diagrams-preview
+          path: diagrams/
+          if-no-files-found: ignore
+
       - name: Commit generated diagrams
+        if: github.event_name != 'pull_request' && steps.find.outputs.any == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -417,9 +426,9 @@ jobs:
 
       # outcome, not conclusion: continue-on-error turns the conclusion into success
       - name: Fail if any diagram failed to render
-        if: steps.generate.outcome == 'failure'
+        if: steps.render.outcome == 'failure'
         run: |
-          echo "::error::Some diagrams failed to render. The ones that succeeded were committed; see the Generate diagrams step for details."
+          echo "::error::Some diagrams failed to render. The rest were still previewed / committed; see the Generate diagrams step for details."
           exit 1
 ```
 
